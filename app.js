@@ -651,7 +651,6 @@ if (currentPage === "post.html") { //kontrollojme nese jemi ne keto dy faqe
                 localStorage.setItem('users', JSON.stringify(users));
             }
 
-            // 2️⃣ Gjenero direkt ne DOM
             const commentDiv = document.createElement('div');
             commentDiv.classList.add('single-comment');
             commentDiv.innerHTML = `
@@ -662,11 +661,9 @@ if (currentPage === "post.html") { //kontrollojme nese jemi ne keto dy faqe
             `;
             commentsContainer.appendChild(commentDiv);
 
-            // 3️⃣ Përditëso numrin e komenteve
             const postCommentsCount = comments.filter(c => c.postId === postId).length;
             commentsCount.innerHTML = `(${postCommentsCount})`;
 
-            // 4️⃣ Pastrimi i input-it
             document.getElementById("comment-input").value = "";
         });
     }
