@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forum - Home</title>
+  <link rel="icon" type="image/x-icon" href="images/OIP.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main>
+    <div class="head">
+      <div>
+        <a><h1>ForumHub.</h1></a>
+      </div>
+      <div class="navigation">
+        <nav>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="post.html">Posts</a></li>
+            <li><a href="create-post.html">Create Post</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="login.html" id="login-link">Log In</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="icons-profile">
+        <i class="fa-solid fa-user icon-logged-in"></i>
+        <i class="fa-regular fa-user icon-guest"></i>
+        <h3 class="profile-header-name">Guest</h3>
+        <div class="logout-link">
+          <h3>|</h3>
+          <a href="login.html"><i class="fa-solid fa-right-to-bracket" title="Log out" ></i></a>
+        </div>
+      </div>
+      <div id="hamburger" class="hamburger"><i class="fa-solid fa-bars"></i></div>
+        <div id="overlay" class="overlay"></div>
+        <div id="menu" class="menu">
+          <span id="close" class="close">✖</span>
+          <div class="menu-content">
+            <div class="menu-profile">
+              <i class="fa-solid fa-circle-user"></i>
+              <h3 class="profile-header-name">Guest</h3>
+              <div class="logout-link">
+                <h3>|</h3>
+                <a href="login.html"><i class="fa-solid fa-right-to-bracket" title="Log out" ></i></a>
+              </div>
+            </div>
+            <div class="menu-nav">
+              <a href="index.html">Home</a>
+              <a href="post.html">Post</a>
+              <a href="create-post.html">Create Post</a>
+              <a href="profile.html">Profile</a>
+            </div>
+            <div class="menu-links">
+              <a href="login.html">Log In</a>
+              <p>/</p>
+              <a href="register.html">Register</a>
+            </div>
+          </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="searchbar">
+    <div class="searchbar-categories">
+      <nav>
+        <ul>
+          <li><div class="dropdown">
+              <button class="dropbtn">Categories ▾</button>
+              <div class="dropdown-content">
+                <a href="#" data-category="General" id="general">General</a>
+                <a href="#" data-category="Tech" id="tech">Tech</a>
+                <a href="#" data-category="Sports" id="sports">Sports</a>
+                <a href="#" data-category="Education" id="education">Education</a>
+                <a href="#" data-category="Ideas" id="ideas">Ideas</a>
+              </div>
+            </div>
+            </li>
+          <li><a href="">All Posts</a></li>
+          <li><a href="" id="myposts">My Posts</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="searchbar-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input placeholder="Search">
+    </div>
+  </div>
+
+  <section class="preview">
+    <div class="preview-container">
+      <h2>Explore Forum</h2>
+      <p>Explore the forum below and find answers to all of your questions</p>
+    </div>
+  </section>
+
+  <section class="createpost">
+    <div class="postbutton">
+      <h2 id="post-categories">All Posts</h2>
+      <button id="createPostBtn">Create new post</button>
+    </div>
+  </section>
+
+  <section class="card-grid">
+    <div class="cards">
+      <div class="cardpost">
+        <img src="/forum-website/images/workperch-wnZ3ai3_idw-unsplash.jpg" alt="Post image">
+        <div class="insidecards">
+          <p>Best laptop for programming under $1000?</p>
+          <div class="msgviewicon">
+            <i class="fa-regular fa-eye"></i><p>2</p>
+            <i class="fa-regular fa-message"></i><p>3</p>
+          </div>
+        </div>
+        <p id="comment-text">Choosing a laptop for coding can be tricky with so many options. What specs really matter, and which models offer the best value for developers?</p>
+      </div>
+    </div>
+    <div class="no-posts">No posts found</div>
+  </section>
+
+  <section>
+    <div class="comment-section">
+      <h2>Latest comments <span id="comments-count">(0)</span></h2>
+      <div class="comments-container">
+        <div class="single-comment">
+          <i class="fa-solid fa-circle-user"></i> <span class="profile-header-name">Bjorni Tare</span>
+          <p class="comment-date">January 30, 2026 at 11:40 AM</p>
+          <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Fuga tenetur minus numquam blanditiis ea ex, distinctio deserunt earum dolores ipsum expedita hic officia nobis provident totam possimus pariatur impedit nihil.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+          <a href="#">Privacy Policy</a> • 
+          <a href="#">Terms of Service</a>
+        </div>
+            <p>&copy;2026 ForumHub.All right reserved.</p>
+      <div class="footer-icons">
+            <i class="fa-brands fa-facebook-f"></i>
+            <i class="fa-brands fa-linkedin-in"></i>
+            <i class="fa-brands fa-instagram"></i>
+        </div>
+    </div>
+    <div class="footer-content-mobile">
+        <div class="footer-links-mobile">
+          <a href="#">Privacy Policy</a> • 
+          <a href="#">Terms of Service</a>
+        </div>
+        <div class="footer-icons-mobile">
+            <i class="fa-brands fa-facebook-f"></i>
+            <i class="fa-brands fa-linkedin-in"></i>
+            <i class="fa-brands fa-instagram"></i>
+        </div>
+        <div class="dash"></div>
+        <p>&copy;2026 ForumHub.All right reserved.</p>
+    </div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

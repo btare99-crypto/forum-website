@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forum - Register</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="register-viewport">
+        <div class="register-container">
+            <h2>Register</h2>
+            <form action="#" method="POST">
+                <p id="username-requirements">Username requirements do not met</p>
+                <div class="username-input">
+                    <label for="username"></label><br>
+                    <input type="text" id="username" name="username" placeholder="Username" required><br>
+                </div>
+
+                <div class="email-input">
+                    <label for="email"></label><br>
+                    <input type="email" id="email" name="email" placeholder="Email" required><br>
+                </div>
+                
+                <div class="password-input">
+                    <label for="password"></label><br>
+                    <input type="password" id="password" name="password" placeholder="Password" required><br>
+                </div>
+
+                <div class="password-input" >
+                    <label for="password"></label><br>
+                    <input type="password" id="confirm-password" name="password" placeholder="Confirm Password" required><br>
+                </div>
+                <p id="password-match">Passwords do not match!</p>
+
+                <button type="submit" class="login-btn">Register</button>
+                <p id="error"></p>
+            </form>
+               <div class="register-or">
+                    <div class="dash-register"></div>
+                    <p>or</p>
+                    <div class="dash-register"></div>
+                </div>
+                <div class="register-icons">
+                    <a href=""><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href=""><i class="fa-brands fa-google"></i></a>
+                    <a href=""><i class="fa-brands fa-apple"></i></a>
+                </div>
+            <div class="register-link">
+                <p>Already have an account? <a href="login.html">Log in</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
