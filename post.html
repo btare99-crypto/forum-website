@@ -4,19 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Forum - Post Detail</title>
+  <link rel="icon" type="image/x-icon" href="images/message-solid-full.svg">
+
+
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+  
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main>
-    <!-- Header -->
+  
     <div class="head">
       <div class="forumHub">
         <h1>ForumHub.</h1>
       </div>
+
+      
       <div class="navigation">
         <nav>
           <ul>
@@ -28,105 +36,94 @@
           </ul>
         </nav>
       </div>
+
+      
       <div class="icons-profile">
         <i class="fa-solid fa-user icon-logged-in"></i>
         <i class="fa-regular fa-user icon-guest"></i>
         <h3 class="profile-header-name">Guest</h3>
         <div class="logout-link">
           <h3>|</h3>
-          <a href="login.html"><i class="fa-solid fa-right-to-bracket" title="Log out" ></i></a>
+          <a href="login.html"><i class="fa-solid fa-right-to-bracket" title="Log out"></i></a>
         </div>
       </div>
+
+      
       <div id="hamburger" class="hamburger"><i class="fa-solid fa-bars"></i></div>
       <div id="overlay" class="overlay"></div>
       <div id="menu" class="menu">
         <span id="close" class="close">✖</span>
         <div class="menu-content">
+
+          
           <div class="menu-profile">
             <i class="fa-solid fa-circle-user"></i>
-            <h3 class="profile-header-name" >Guest</h3>
+            <h3 class="profile-header-name">Guest</h3>
             <div class="logout-link">
-                <h3>|</h3>
-                <a href="login.html"><i class="fa-solid fa-right-to-bracket" title="Log out" ></i></a>
+              <h3>|</h3>
+              <a href="login.html"><i class="fa-solid fa-right-to-bracket" title="Log out"></i></a>
             </div>
           </div>
+
+          
           <div class="menu-nav">
-              <a href="index.html">Home</a>
-              <a href="post.html">Post</a>
-              <a href="create-post.html">Create Post</a>
-              <a href="profile.html">Profile</a>
+            <a href="index.html">Home</a>
+            <a href="post.html">Post</a>
+            <a href="create-post.html">Create Post</a>
+            <a href="profile.html">Profile</a>
           </div>
+
           <div class="menu-links">
-              <a href="login.html">Log In</a>
-              <p>/</p>
-              <a href="register.html">Register</a>
+            <a href="login.html">Log In</a>
+            <p>/</p>
+            <a href="register.html">Register</a>
           </div>
+
         </div>
       </div>
     </div>
 
-    <div class="cards">
-      <div class="cardpost">
-        <img src="/forum-website/images/workperch-wnZ3ai3_idw-unsplash.jpg" alt="Post image">
-        <div class="insidecards">
-          <p>Best laptop for programming under $1000?</p>
-          <div class="msgviewicon">
-            <i class="fa-regular fa-eye"></i><p>2</p>
-            <i class="fa-regular fa-message"></i><p>3</p>
-          </div>
-        </div>
-        <p id="comment-text">Choosing a laptop for coding can be tricky with so many options. What specs really matter, and which models offer the best value for developers?</p>
+
+    <div class="all-cards">
+      <div class="cards-post">
       </div>
     </div>
+
     <div class="no-posts">No posts found</div>
 
-    <!-- Comments Section -->
-    <section>
-      <div class="comment-section">
-        <h2>Comments <span id="comments-count">(0)</span></h2>
-        <div class="comments-container">
-          <div class="single-comment">
-            <i class="fa-solid fa-circle-user"></i> <span class="profile-header-name">Bjorni Tare</span>
-            <p class="comment-date">January 30, 2026 at 11:40 AM</p>
-            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Fuga tenetur minus numquam blanditiis ea ex, distinctio deserunt earum dolores ipsum expedita hic officia nobis provident totam possimus pariatur impedit nihil.</p>
-          </div>
-        </div>
-        <h2>Add a Comment</h2>
-        <form>
-          <textarea id="comment-input" placeholder="Write your comment here..."></textarea>
-          <button id="add-comment-btn" type="submit">Post Comment</button>
-        </form>
-      </div>
-    </section>
-
   </main>
+
+  
   <footer>
     <div class="footer-content">
       <div class="footer-links">
-          <a href="#">Privacy Policy</a> • 
-          <a href="#">Terms of Service</a>
-        </div>
-            <p>&copy;2026 ForumHub.All right reserved.</p>
+        <a href="#">Privacy Policy</a> • 
+        <a href="#">Terms of Service</a>
+      </div>
+      <p>&copy;2026 ForumHub.All right reserved.</p>
       <div class="footer-icons">
-            <i class="fa-brands fa-facebook-f"></i>
-            <i class="fa-brands fa-linkedin-in"></i>
-            <i class="fa-brands fa-instagram"></i>
-        </div>
+        <i class="fa-brands fa-facebook-f"></i>
+        <i class="fa-brands fa-linkedin-in"></i>
+        <i class="fa-brands fa-instagram"></i>
+      </div>
     </div>
+
     <div class="footer-content-mobile">
-        <div class="footer-links-mobile">
-          <a href="#">Privacy Policy</a> • 
-          <a href="#">Terms of Service</a>
-        </div>
-        <div class="footer-icons-mobile">
-            <i class="fa-brands fa-facebook-f"></i>
-            <i class="fa-brands fa-linkedin-in"></i>
-            <i class="fa-brands fa-instagram"></i>
-        </div>
-        <div class="dash"></div>
-        <p>&copy;2026 ForumHub.All right reserved.</p>
+      <div class="footer-links-mobile">
+        <a href="#">Privacy Policy</a> • 
+        <a href="#">Terms of Service</a>
+      </div>
+      <div class="footer-icons-mobile">
+        <i class="fa-brands fa-facebook-f"></i>
+        <i class="fa-brands fa-linkedin-in"></i>
+        <i class="fa-brands fa-instagram"></i>
+      </div>
+      <div class="dash"></div>
+      <p>&copy;2026 ForumHub.All right reserved.</p>
     </div>
   </footer>
+
+ 
   <script src="app.js"></script>
 </body>
 </html>

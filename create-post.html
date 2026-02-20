@@ -4,127 +4,156 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Forum - Create a Post</title>
+  <link rel="icon" type="image/x-icon" href="images/plus-solid-full.svg">
+
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+  
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main>
-        <div class="head">
-            <div class="forumHub">
-                <h1>ForumHub.</h1>
-            </div>
-            <div class="navigation">
-                <nav>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="post.html">Posts</a></li>
-                    <li><a href="create-post.html">Create Post</a></li>
-                    <li><a href="profile.html">Profile</a></li>
-                    <li><a href="login.html" target="_blank" id="login-link">Log In</a></li>
-                </ul>
-                </nav>
-            </div>
-            <div class="icons-profile">
-                <i class="fa-solid fa-user icon-logged-in"></i>
-                <i class="fa-regular fa-user icon-guest"></i>
-                <h3 class="profile-header-name">Guest</h3>
-                <div class="logout-link">
-                    <h3>|</h3>
-                    <a href="login.html" target="_blank"><i class="fa-solid fa-right-to-bracket" title="Log out" ></i></a>
-                </div>
-            </div>
-            <div id="hamburger" class="hamburger"><i class="fa-solid fa-bars"></i></div>
-            <div id="overlay" class="overlay"></div>
-            <div id="menu" class="menu">
-                <span id="close" class="close">✖</span>
-                <div class="menu-content">
-                    <div class="menu-profile">
-                        <i class="fa-solid fa-circle-user"></i>
-                        <h3 class="profile-header-name" >Guest</h3>
-                        <div class="logout-link">
-                            <h3>|</h3>
-                            <a href="login.html"><i class="fa-solid fa-right-to-bracket" title="Log out" ></i></a>
-                        </div>
-                    </div>
-                    <div class="menu-nav">
-                        <a href="index.html">Home</a>
-                        <a href="post.html">Post</a>
-                        <a href="create-post.html">Create Post</a>
-                        <a href="profile.html">Profile</a>
-                    </div>
-                    <div class="menu-links">
-                        <a href="login.html">Log In</a>
-                        <p>/</p>
-                        <a href="register.html">Register</a>
-                    </div>
-                </div>
-            </div>
+  <main>
+   
+    <div class="head">
+      <div class="forumHub">
+        <h1>ForumHub.</h1>
+      </div>
+
+    
+      <div class="navigation">
+        <nav>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="post.html">Posts</a></li>
+            <li><a href="create-post.html">Create Post</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="login.html" id="login-link" target="_blank">Log In</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      
+      <div class="icons-profile">
+        <i class="fa-solid fa-user icon-logged-in"></i>
+        <i class="fa-regular fa-user icon-guest"></i>
+        <h3 class="profile-header-name">Guest</h3>
+        <div class="logout-link">
+          <h3>|</h3>
+          <a href="login.html" target="_blank"><i class="fa-solid fa-right-to-bracket" title="Log out"></i></a>
         </div>
+      </div>
+
+      
+      <div id="hamburger" class="hamburger"><i class="fa-solid fa-bars"></i></div>
+      <div id="overlay" class="overlay"></div>
+      <div id="menu" class="menu">
+        <span id="close" class="close">✖</span>
+        <div class="menu-content">
+
+          
+          <div class="menu-profile">
+            <i class="fa-solid fa-circle-user"></i>
+            <h3 class="profile-header-name">Guest</h3>
+            <div class="logout-link">
+              <h3>|</h3>
+              <a href="login.html"><i class="fa-solid fa-right-to-bracket" title="Log out"></i></a>
+            </div>
+          </div>
+
+         
+          <div class="menu-nav">
+            <a href="index.html">Home</a>
+            <a href="post.html">Post</a>
+            <a href="create-post.html">Create Post</a>
+            <a href="profile.html">Profile</a>
+          </div>
+
+          
+          <div class="menu-links">
+            <a href="login.html">Log In</a>
+            <p>/</p>
+            <a href="register.html">Register</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+   
     <div class="create-post-viewport">
-        <div class="create-post">
-            <h2>Create New Post</h2>
-            <form>
-                    <label for="title">Post Title</label><br>
-                    <input type="text" id="title" placeholder="Enter post title..." minlength="5" maxlength="100" required>
-                    <small id="post-title-count">0 / 100</small><br>
-                <div class="file-and-category">
-                    <div>
-                        <label for="image" >Upload Image</label>
-                        <input type="file" id="image" class="input" accept="image/*">
-                    </div>
+      <div class="create-post">
+        <h2>Create New Post</h2>
+        <form>
+          
+          <label for="title">Post Title</label><br>
+          <input type="text" id="title" placeholder="Enter post title..." minlength="5" maxlength="100" required>
+          <small id="post-title-count">0 / 100</small><br>
 
-                    <div>
-                        <label for="categories">Category</label>
-                        <select id="categories" name="category" required>
-                            <option value="">Choose</option>
-                            <option value="General">General</option>
-                            <option value="Tech">Tech</option>
-                            <option value="Sports">Sports</option>
-                            <option value="Education">Education</option>
-                            <option value="Ideas">Ideas</option>
-                        </select>
-                    </div>
-                </div>
+          
+          <div class="file-and-category">
+            <div>
+              <label for="image">Upload Image</label>
+              <input type="file" id="image" class="input" accept="image/*">
+            </div>
+            <div>
+              <label for="categories">Category</label>
+              <select id="categories" name="category" required>
+                <option value="">Choose</option>
+                <option value="General">General</option>
+                <option value="Tech">Tech</option>
+                <option value="Sports">Sports</option>
+                <option value="Education">Education</option>
+                <option value="Ideas">Ideas</option>
+              </select>
+            </div>
+          </div>
 
-                <label for="description">Description</label><br>
-                <textarea id="description" rows="6" placeholder="Write your post description..." minlength="20" maxlength="200" required></textarea>
-                <small id="post-description-count">0 / 200</small><br><br>
+          
+          <label for="description">Description</label><br>
+          <textarea id="description" rows="6" placeholder="Write your post description..." minlength="20" maxlength="200" required></textarea>
+          <small id="post-description-count">0 / 200</small><br><br>
 
-                <button type="submit">Publish Post</button>
-            </form>
-        </div>
+          <button type="submit">Publish Post</button>
+        </form>
+      </div>
     </div>
-    </main>
-    <script src="app.js"></script>
-    <footer>
+  </main>
+
+ 
+  <footer>
     <div class="footer-content">
-        <div class="footer-links">
-            <a href="#">Privacy Policy</a> • 
-            <a href="#">Terms of Service</a>
-        </div>
-        <p>&copy;2026 ForumHub.All right reserved.</p>
-        <div class="footer-icons">
-            <i class="fa-brands fa-facebook-f"></i>
-            <i class="fa-brands fa-linkedin-in"></i>
-            <i class="fa-brands fa-instagram"></i>
-        </div>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a> • 
+        <a href="#">Terms of Service</a>
+      </div>
+      <p>&copy;2026 ForumHub.All right reserved.</p>
+      <div class="footer-icons">
+        <i class="fa-brands fa-facebook-f"></i>
+        <i class="fa-brands fa-linkedin-in"></i>
+        <i class="fa-brands fa-instagram"></i>
+      </div>
     </div>
+
     <div class="footer-content-mobile">
-        <div class="footer-links-mobile">
-          <a href="#">Privacy Policy</a> • 
-          <a href="#">Terms of Service</a>
-        </div>
-        <div class="footer-icons-mobile">
-            <i class="fa-brands fa-facebook-f"></i>
-            <i class="fa-brands fa-linkedin-in"></i>
-            <i class="fa-brands fa-instagram"></i>
-        </div>
-        <div class="dash"></div>
-        <p>&copy;2026 ForumHub.All right reserved.</p>
+      <div class="footer-links-mobile">
+        <a href="#">Privacy Policy</a> • 
+        <a href="#">Terms of Service</a>
+      </div>
+      <div class="footer-icons-mobile">
+        <i class="fa-brands fa-facebook-f"></i>
+        <i class="fa-brands fa-linkedin-in"></i>
+        <i class="fa-brands fa-instagram"></i>
+      </div>
+      <div class="dash"></div>
+      <p>&copy;2026 ForumHub.All right reserved.</p>
     </div>
-    </footer>
+  </footer>
+
+
+  <script src="app.js"></script>
 </body>
 </html>

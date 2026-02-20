@@ -2,9 +2,9 @@
     box-sizing: border-box;
 }
 :root{
-    --primary-color: #126a6a;
-    --primary-hover: #094141;
-    --dark-color: #333;
+    --primary-color: #053862;
+    --primary-hover: #1e5c90;
+    --dark-color: #000000;
     --light-color: hsl(0, 0%, 85%);
     --white: #ffffff;
     --border-color: #dee2e6;
@@ -36,7 +36,7 @@ main {
     color: white;
     font-weight: 100;
     padding: 0 20px;
-    background-color: var(--primary-color);
+    background: linear-gradient(to bottom, var(--primary-hover), var(--dark-color));
 }
 .head h1{
     cursor: pointer;
@@ -52,24 +52,28 @@ main {
     border-radius: 20px;
     justify-self: center;
 }
-
 .navigation nav ul li a {
     text-decoration: none;
     color: var(--white);
     padding: 10px 20px;
     transition: 0.3s all;
 }
+.navigation nav ul li a.active {
+    text-decoration: none;
+    border-radius: 15px;
+    font-weight: lighter;
+    background-color: var(--primary-hover);
+    padding: 10px 20px;
+    transition: 0.3s all;
+}
 .hamburger , .menu , .overlay {
     display: none;
 }
-
 .navigation nav ul li a:hover {
     background-color: var(--primary-hover);
     color: var(--white);
     border-radius: 15px;
 }
-
-/* Header Icons */
 .icons {
     position: relative;
     justify-content: center;
@@ -82,9 +86,6 @@ main {
 .icon-guest{
     display: none;
 }
-
-
-/* Search Bar */
 .searchbar {
     display: flex;
     justify-content: space-between;
@@ -96,7 +97,6 @@ main {
   position: relative;
   display: inline-block;
 }
-
 .dropbtn {
   background: none;
   border: none;
@@ -105,7 +105,6 @@ main {
   cursor: pointer;
   padding: 10px;
 }
-
 .dropdown-content {
   display: none;
   position: absolute;
@@ -115,24 +114,18 @@ main {
   padding: 10px;
   overflow: hidden;
 }
-
 .dropdown-content a {
   padding: 10px 14px;
   text-decoration: none;
   display: block;
 }
-
 .dropdown-content a:hover {
   background-color: var(--light-color);
   border-radius: 5px;
 }
-
 .dropdown:hover .dropdown-content {
   display: block;
 }
-
-
-/* Search Bar Categories */
 .searchbar-categories nav ul,
 .searchbar-categories a {
     list-style: none;
@@ -147,13 +140,11 @@ main {
 .searchbar-categories a:hover{
     text-decoration: underline;
 }
-/* Search Input */
 .searchbar-search {
     position: relative;
-    width: 200px; /* ruhet madhësia origjinale */
-    margin: 0; /* heq margin-right që e nxirrte jashtë */
+    width: 200px;
+    margin: 0;
 }
-
 .searchbar-search input {
     width: 100%;
     outline: none;
@@ -164,7 +155,6 @@ main {
     border: 1px solid grey;
     box-sizing: border-box;
 }
-
 .searchbar-search i {
     position: absolute;
     left: 10px;
@@ -173,8 +163,6 @@ main {
     color: var(--dark-color);
     pointer-events: none;
 }
-
-/* Preview Section */
 .preview-container {
     height: 250px;
     background-image: url(images/ales-nesetril-Im7lZjxeLhg-unsplash\ copy.jpg);
@@ -187,17 +175,13 @@ main {
     color: var(--white);
     text-align: center;
 }
-
 .preview-container h2 {
     font-size: 60px;
     margin: 0;
 }
-
 .preview-container p {
     font-size: 20px;
 }
-
-/* Create Post Button */
 .postbutton {
     display: flex;
     justify-content: space-between;
@@ -208,7 +192,6 @@ main {
     margin: 40px;
     color: var(--primary-color);
 }
-
 .createpost button ,
 .postbutton-profile button {
     padding: 10px 15px;
@@ -223,9 +206,8 @@ main {
     background-color: var(--primary-hover);
     transition: all 0.3s;
 }
-/* Cards Grid */
 .cards ,
-.cards-profile{
+.cards-profile {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
@@ -233,8 +215,14 @@ main {
     margin-top: 40px;
     margin-bottom: 40px;
 }
-
-/* Individual Card */
+.cards-post {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 40px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
 .editcardpost , 
 .post-header{
     position: relative;
@@ -242,7 +230,6 @@ main {
 .post-header i{
     font-size: 30px;
 }
-
 .post-meta{
     position: absolute;
     display: flex;
@@ -256,7 +243,6 @@ main {
 .post-info{
     display: flex;
     flex-direction: column;
-
 }
 .post-info p , 
 .post-info h3{
@@ -265,88 +251,144 @@ main {
 .post-info p{
     font-size: 0.8em;
 }
-.cardpost ,
-.cardpost-profile {
+.cardpost-profile ,
+.cardhome {
     width: 100%;
+    max-width: 470px;
+    overflow-wrap: break-word;
     aspect-ratio: 1 / 1;
     background-color: var(--white);
     position: relative;
     cursor: pointer;
     transition: all 0.3s ease;
 }
+.post-content{
+    width: 100%;
+    max-width: 470px;
+    overflow-wrap: break-word;
+    aspect-ratio: 1 / 1;
+    background-color: var(--white);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.cardpost , .cardpost-post{
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--white);
+    border: 1px solid var(--primary-color);
+    transition: all 0.3s ease;
+}
 .cardpost-profile:hover .edit-btn {
     display: block;
 }
-
 .cardpost-profile:hover .delete-btn {
     display: block;
 }
-
 .cardpost img ,
+.cardhome img ,
 .cardpost-profile img {
     max-width: 100%;
     height: 65%;
     object-fit: cover;
     display: block;
 }
-
-/* Card Content */
 .insidecards {
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: var(--primary-color);
-    padding: 0 30px;
+    padding: 0 20px;
 }
 .msgviewicon{
     display: flex;
     align-items: center;
-    color: #126a6a;
+    color: var(--primary-color);
     justify-content: center;
     gap: 10px;
 }
-
 .no-posts{
     text-align: center;
     margin-bottom: 70px;
     display: none;
 }
-
-/* Comment Text */
-#comment-text {
-    padding-left: 30px;
+.comment-text {
+    margin: 0;
+    padding:5px 20px;
     color: var(--primary-color);
     font-size: 0.9em;
 }
-/* COMMENTS */
 .comment-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     margin: 0 40px;
-    padding: 20px;
-}
-.single-comment{
-    border-bottom: 1px solid var(--primary-color);
-    padding: 20px;
-    font-size: 1.5em;
-}
-.comment-date{
-    font-size: 0.7em;
-}
-.comment-section textarea{
     width: 100%;
-    height: 200px;
-    border-radius: 5px;
-    padding: 10px;
-    box-sizing: border-box;
+    padding: 20px;
 }
-.comment-section button{
-    height: 40px;
-    margin-top: 10px;
+.latest-comments{
+    margin: 0 40px;
+}
+.comment-section h2{
+    font-size: 1.2em;
+}
+.comments-form textarea{
+    min-height: 80px;
+    width: 100%;
     border-radius: 5px;
-    width: 200px;
+    box-sizing: border-box;
+    padding: 5px;
+    outline: none;
+}
+.comments-form button{
+    padding: 6px 12px;
+    width: 100%;
+    max-width: 250px;
+    height: 30px;
+    margin-top: 10px;
     border: none;
     background-color: var(--primary-color);
     color: white;
     cursor: pointer;
+}
+.comments-form{
+    margin-bottom: 10px;
+}
+.comments-form h2{
+    font-size: 1.2em;
+}
+.comments-container{
+    max-height: 220px;
+    overflow-y: auto;
+}
+.comments-container::-webkit-scrollbar{
+    width: 10px;
+}
+.comments-container::-webkit-scrollbar-track{
+    background:#eee ;
+    border-radius: 5px;
+}
+.comments-container::-webkit-scrollbar-thumb{
+    background:#888 ;
+    border-radius: 8px;
+    border: 2px solid #eee;
+}
+.single-comment{
+    border-bottom: 1px solid var(--primary-color);
+    padding: 15px;
+    font-size: 1.1em;
+    word-wrap: break-word;  
+    word-break: break-word; 
+    white-space: normal;
+}
+.single-comment button{
+    border: none;
+}
+.delete-comment{
+    display: none;
+}
+.comment-date{
+    font-size: 0.7em;
 }
 .footer-content-mobile{
     display: none;
@@ -379,7 +421,6 @@ main {
     text-decoration: none;
     color: var(--white);
 }
-/* LOGIN */
 .login-viewport ,
 .register-viewport{
     display: flex;
@@ -387,7 +428,7 @@ main {
     align-items: center;
     flex-direction: column;
     height: 100vh;
-    background-color: var(--primary-color);
+    background: linear-gradient(to left, var(--primary-hover), black);
 }
 .login-container , 
 .register-container{
@@ -438,7 +479,6 @@ main {
 .email-input input:focus{
     outline: none;
     border-bottom: 3px solid #126a6a;
-
 }
 .username-input ,
 .password-input ,
@@ -461,8 +501,6 @@ main {
     margin-top: 100px;
     text-align: center;
 }
-
-/* REGISTER */
 .register-container button{
     margin-top: 10px;
 }
@@ -481,7 +519,6 @@ main {
     justify-content: center;
     gap: 45px;
     font-size: 25px;
- 
 }
 .register-icons a{
     color: var(--primary-color);
@@ -491,8 +528,6 @@ main {
     color: var(--primary-hover);
     transition: all 0.3s;
 }
-
-/* PROFILE */
 .profile-viewport{
     display: flex;
     justify-content: center;
@@ -505,7 +540,8 @@ main {
     width: fit-content;
     height: fit-content;
     padding:40px 100px;
-    box-shadow: 0 0 15px #126a6a;
+    color: var(--primary-color);
+    box-shadow: 0 0 15px var(--primary-color);
 }
 .my-profile input{
     display: none;
@@ -521,16 +557,17 @@ main {
     color: var(--primary-color);
     vertical-align: middle;
 }
-.icon-box:hover .fa-pen-to-square{
-    opacity: 1;
-}
 .icon-box .fa-pen-to-square{
     font-size: 15px;
+    color: var(--primary-color);
     position: absolute;
     cursor: pointer;
     opacity: 0;
     bottom: 0;
     right: 1;
+}
+.icon-box:hover .fa-pen-to-square{
+    opacity: 1;
 }
 .welcome{
     margin-top: 30px;
@@ -566,7 +603,7 @@ main {
     justify-content: center;
     align-items: center;
     justify-self: end;
-    gap: 10px;
+    gap: 12px;
 }
 .icons-profile i {
     font-size: 1.2em;
@@ -578,8 +615,6 @@ main {
     justify-content:space-between ;
     margin-left: 40px;
 }
-
-/* CREATE POST */
 .create-post {
     width: 100%;
     max-width: 800px;
@@ -590,20 +625,17 @@ main {
     font-family: "Raleway", sans-serif;
     box-sizing: border-box;
 }
-
 .create-post h2 {
     margin-bottom: 25px;
     color: var(--primary-color);
     font-size: 26px;
     text-align: center;
 }
-
 .create-post label {
     font-weight: 600;
     display: block;
     margin-top: 18px;
 }
-
 .create-post input[type="text"],
 .create-post textarea {
     width: 100%;
@@ -614,7 +646,6 @@ main {
     transition: all 0.25s ease;
     box-sizing: border-box;
 }
-
 .create-post input[type="text"]:focus,
 .create-post textarea:focus {
     border-color: var(--primary-color);
@@ -626,13 +657,6 @@ main {
     justify-content: space-between;
     align-items: center;
 }
-
-.create-post input[type="file"] 
-.create-post select{
-    margin-top: 8px;
-    font-size: 14px;
-}
-
 .create-post input[type="file"]::file-selector-button ,
 .create-post select {
     margin-top: 15px;
@@ -646,17 +670,14 @@ main {
 .create-post input[type="file"]::file-selector-button {
     margin-right: 10px;
 }
-
 .create-post input[type="file"]::file-selector-button:hover ,
 .create-post select:hover {
     background-color: var(--primary-hover);
 }
-
 .create-post textarea {
     resize: vertical;
     min-height: 120px;
 }
-
 .create-post button {
     width: 100%;
     margin-top: 25px;
@@ -669,12 +690,13 @@ main {
     cursor: pointer;
     transition: all 0.25s ease;
 }
-
 .create-post button:hover {
     background-color: var(--primary-hover);
-    box-shadow: 0 6px 18px var(--dark-color);
 }
-
+.create-post button:active {
+    background-color: var(--primary-hover);
+    transform: scale(0.98);
+}
 .dropdown-menu {
     display: none;
     position: absolute;
@@ -691,18 +713,15 @@ main {
     padding: 8px 15px;
     color: var(--primary-color);
 }
-
 .dropdown-menu nav ul li:hover  {
     display: block;
 }
-
 .edit-delte-btns{
     position: absolute;
     display: flex;
     justify-content: space-between;
     width: 100%;
 }
-
 .edit-btn,
 .delete-btn {
   padding: 8px 14px;
@@ -714,28 +733,12 @@ main {
   transition: all 0.3s ease;
   color: var(--white);
 }
-
 .edit-btn {
   background-color: var(--primary-color);
 }
-
-.edit-btn:hover {
-  background-color: var(--primary-hover);
-}
-
 .delete-btn {
   background-color: var(--error-color);
 }
-
-.delete-btn:hover {
-  background-color: var(--error-color);
-}
-
-.icons-profile {
-  gap: 12px;
-}
-
-/* Login button at profile when you are a guest */
 .guest-box {
     text-align: center;
     display: flex;
@@ -768,8 +771,6 @@ main {
     align-items: center;
     gap: 10px;
 }
-
-/*Incorrect alerts */
 #incorrectusername {
     visibility: hidden;
     color: var(--error-color);
@@ -780,9 +781,7 @@ main {
     color: var(--error-color);
     visibility: hidden;
 }
-
-@media (min-width:320px) and (max-width: 600px)  {
-
+@media (min-width:320px) and (max-width: 656px)  {
     .head {
         display: flex;
         flex-direction: row;
@@ -820,7 +819,7 @@ main {
         right: -100%;
         width: 100%;
         height: 100%;
-        background-color: var(--dark-color);
+        background: linear-gradient(to bottom, var(--primary-hover), black);
         box-shadow: -2px 0 10px var(--dark-color);
         padding: 20px;
         transition: right 0.3s ease;
@@ -859,9 +858,6 @@ main {
         align-items: center;
         gap: 10px;
     }
-
-
-    /* Search Bar */
     .searchbar {
         display: flex;
         flex-direction: column;
@@ -869,61 +865,76 @@ main {
         margin-bottom: 10px;
         position: relative;
     }
-
     .dropdown-content {
     z-index: 10;
     }
-
-    /* Search Bar Categories */
     .searchbar-categories a {
         text-decoration: none;
         color: var(--primary-color);
     }
-    /* Search Input */
     .searchbar-search {
         width: 100%; 
     }
-
-    /* Preview Section */
-
-    .preview-container h1 {
+    .preview-container h2 {
         font-size: 40px;
     }
-
     .preview-container p {
         font-size: 15px;
     }
-
-    /* Create Post Button */
     .postbutton {
         flex-direction: column;
         line-height: 0;
     }
-
     .createpost button {
         width: 80%;
         border: none;
         background-color: var(--primary-color);
         color: var(--white);
     }
-
-    /* Cards Grid */
+    .cardhome , .post-content , .cardpost-profile{
+        max-height: 100%;
+    }
+    .cardpost{
+        flex-direction: column;
+        width: 100%;
+        background-color: var(--white);
+        position: relative;
+        box-shadow: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
     .cards ,
     .cards-profile{
         display: flex;
         flex-direction: column;
         padding: 0 15px 25px;
     }
-
-    /* Card Content */
+    .cards-post {
+        display: flex;
+        flex-direction: column;
+        padding: 0 15px 25px;
+    }
     .insidecards {
         padding: 0 15px;
     }
-
-    /* COMMENTS */
     .comment-section{
-        margin: 15px;
-        padding:0 ;
+        margin: 0;
+        padding:15px ;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        display: none;
+        box-sizing: border-box;
+    }
+    .comment-section.open {
+    display: block;
+    }
+    .fa-message {
+        z-index: 10;
+    }
+    .comments-form button{
+        max-width: 100%;
+        border-radius: 5px;
     }
     .comment-section h2{
         font-size: 1.2em;
@@ -931,10 +942,6 @@ main {
     .comment-section textarea{
         height: 100px;
     }
-    .comment-section button{
-        width: 100%;
-    }
-
     .footer-content{
         display: none;
     }
@@ -955,7 +962,6 @@ main {
         border-bottom: 1px solid var(--white);
         width: 80%;
     }
-
     .footer-icons-mobile {
         display: flex;
         flex-direction: row;
@@ -977,7 +983,6 @@ main {
         text-decoration: none;
         color: var(--white);
     }
-    /* LOGIN */
     .login-viewport ,
     .register-viewport{
         padding: 20px 15px;
@@ -996,7 +1001,7 @@ main {
     }
     .login-container button ,
     .register-container button{
-        width: 100%;
+        max-width: 100%;
         font-size: 16px;
     }
     .username-input input ,
@@ -1005,29 +1010,23 @@ main {
         width: 100%;         
         font-size: 16px;
     }
-
     .username-input ,
     .password-input ,
     .email-input{
         width: 100%;       
         font-size: 16px;
     }
-
     .dash-register {
         width: 100%;
     }
     .register-icons{
         gap: 40px;
         font-size: 22px;
-    
     }
     .register-icons a{
         color: var(--primary-color);
         text-decoration: none;
     }
-
-
-    /* PROFILE */
     .my-profile{
         width: 80%;
         max-width: 250px;
@@ -1048,7 +1047,6 @@ main {
         margin: 0;
         line-height: 1.4;
     }
-
     .postbutton-profile{
         padding: 0;
         margin: 0;
@@ -1061,57 +1059,44 @@ main {
         background-color: var(--primary-color);
         color: var(--white);
     }
-
-    /* CREATE POST */
     .create-post {
-
-    width: auto;
-    margin: 40px 12px;    
-    padding: 20px;          
-    box-shadow: none;       
-    border-radius: 10px;
+        width: auto;
+        margin: 40px 12px;    
+        padding: 20px;          
+        box-shadow: none;       
+        border-radius: 10px;
     }
-
     .create-post h2 {
     font-size: 20px;
     margin-bottom: 18px;
     }
-
     .file-and-category{
     display: grid;
     }
-
     .create-post label , 
     .create-post select{
     font-size: 14px;
     }
-
     .create-post input[type="text"],
     .create-post textarea {
     font-size: 14px;
     padding: 10px 12px;
     }
-
     .create-post input[type="file"] {
     margin-top: 8px;
     font-size: 14px;
     }
-
-
     .create-post textarea {
     min-height: 100px;
     }
-
     .create-post button {
     padding: 12px;
     font-size: 15px;
     border-radius: 8px;
     }
-
     .create-post select option{
     font-size: 0.8em;
     }
-
     .create-post select {
     padding: 8px 12px;
     padding-right: 0;
@@ -1120,8 +1105,6 @@ main {
     margin-top: 8px;
     border-radius: 6px;
     }
-
-
     .create-post input[type="file"]::file-selector-button {
     padding: 8px 12px;
     border-radius: 6px;
@@ -1131,23 +1114,15 @@ main {
     cursor: pointer;
     font-size: 13px;
     }
-
     .edit-btn,
     .delete-btn {
     padding: 6px 12px;
     }
-
-
-    /*Incorrect alerts */
     #incorrectusername {
         font-size: 0.8em;
     }
 }
-
-
-/*Tablet*/
-@media (min-width: 601px) and (max-width: 1024px) and (orientation: portrait) {
-
+@media (min-width: 657px) and (max-width: 1024px) and (orientation: portrait) {
     .head {
         display: flex;
         flex-direction: row;
@@ -1228,19 +1203,18 @@ main {
     .close{
         font-size: 2em;
     }
-
-
-    /* Preview Section */
-
-    .preview-container h1 {
+    .preview-container h2 {
         font-size: 60px;
     }
-
     .preview-container p {
         font-size: 20px;
     }
-
-    /* Cards Grid */
+    .comments-form textarea{
+        min-height: 80px;
+    }
+    .comments-form button{
+        max-width: 100%;
+    }
     .cards ,
     .cards-profile{
         display: grid;
@@ -1248,15 +1222,9 @@ main {
         gap: 20px;
         padding: 0 25px 25px;
     }
-
-    /* COMMENTS */
     .comment-section{
         margin: 0 10px;
     }
-    .comment-section textarea{
-        height: 150px;
-    }
-
     .footer-content{
         display: none;
     }
@@ -1277,7 +1245,6 @@ main {
         border-bottom: 1px solid var(--white);
         width: 80%;
     }
-
     .footer-icons-mobile {
         display: flex;
         flex-direction: row;
@@ -1299,7 +1266,6 @@ main {
         text-decoration: none;
         color: var(--white);
     }
-    /* LOGIN */
     .login-viewport ,
     .register-viewport{
         padding: 30px 20px;
@@ -1318,7 +1284,7 @@ main {
     }
     .login-container button ,
     .register-container button{
-        width: 100%;
+        max-width: 100%;
         font-size: 16px;
     }
     .username-input input ,
@@ -1327,7 +1293,6 @@ main {
         width: 100%;         
         font-size: 16px;
     }
-
     .username-input ,
     .password-input ,
     .email-input{
@@ -1335,22 +1300,17 @@ main {
         font-size: 16px;
         padding-bottom: 15px;
     }
-
     .dash-register {
         width: 100%;
     }
     .register-icons{
         gap: 40px;
         font-size: 22px;
-    
     }
     .register-icons a{
         color: var(--primary-color);
         text-decoration: none;
     }
-
-
-    /* PROFILE */
     .my-profile{
         width: 100%;
         max-width: 500px;
@@ -1375,7 +1335,6 @@ main {
         line-height: 1.4;
         font-size: 2em;
     }
-
     .postbutton-profile{
         padding: 0;
         margin: 0 30px;
@@ -1387,7 +1346,6 @@ main {
         background-color: var(--primary-color);
         color: var(--white);
     }
-    /* CREATE POST */
     .create-post {
     width: auto;
     margin: 20px auto;    
@@ -1395,47 +1353,37 @@ main {
     box-shadow: none;       
     border-radius: 10px;
     }
-
     .create-post h2 {
     font-size: 20px;
     margin-bottom: 18px;
     }
-
     .file-and-category{
     display: grid;
     }
-
     .create-post label , 
     .create-post select{
     font-size: 14px;
     }
-
     .create-post input[type="text"],
     .create-post textarea {
     font-size: 14px;
     padding: 10px 12px;
     }
-
     .create-post input[type="file"] {
     margin-top: 8px;
     font-size: 14px;
     }
-
-
     .create-post textarea {
     min-height: 100px;
     }
-
     .create-post button {
     padding: 12px;
     font-size: 15px;
     border-radius: 8px;
     }
-
     .create-post select option{
     font-size: 0.8em;
     }
-
     .create-post select {
     padding: 8px 12px;
     padding-right: 0;
@@ -1444,8 +1392,6 @@ main {
     margin-top: 8px;
     border-radius: 6px;
     }
-
-
     .create-post input[type="file"]::file-selector-button {
     padding: 8px 12px;
     border-radius: 6px;
@@ -1455,14 +1401,10 @@ main {
     cursor: pointer;
     font-size: 13px;
     }
-
     .edit-btn,
     .delete-btn {
     padding: 6px 12px;
     }
-
-
-    /*Incorrect alerts */
     #incorrectusername {
         font-size: 0.8em;
     }

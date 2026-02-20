@@ -6,6 +6,7 @@ The project simulates a real forum experience with user authentication, post man
 - User registration and login (simulated with localStorage)
 - Create, view, and browse posts
 - Comment on posts
+- Delete your comments or the comments on your posts
 - Search posts by title or content
 - Filter posts by category
 - Responsive design for mobile, tablet, and desktop
@@ -45,16 +46,23 @@ The project simulates a real forum experience with user authentication, post man
 
 ## How to Run
 1. Clone or download this project
-2. Open `index.html` in a web browser
+2. Open `index.html` in a web browser 
 3. Or use VS Code with Live Server extension
+
+## Current Limitations
+- Authentication is frontend-only (not secure)
+- No real database
+- No backend API
+- Sessions are simulated via localStorage
 
 ## Known Issues / Future Improvements
 - [ ] Integrate a real backend (Node.js / database)
 - [ ] Support user avatar uploads
+- [ ] Make the view section interactive
+- [ ] User rating interactive
 - [ ] Improve accessibility (ARIA labels and semantic enhancements)
 - [ ] Add user session handling instead of localStorage authentication
 - [ ] Optimize performance and code structure
-
 
 ## Author
 Bjorni Tare - Junior Frontend Developer Intern

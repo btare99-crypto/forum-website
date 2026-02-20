@@ -1,296 +1,300 @@
+const currentPage = window.location.pathname.split("/").pop(); 
+let currentUser = localStorage.getItem("currentUser"); 
+let users = JSON.parse(localStorage.getItem("users")) || []; 
+let posts = JSON.parse(localStorage.getItem("posts")) || []; 
+let comments = JSON.parse(localStorage.getItem("comments")) || []; 
 
-// ===============================
-// 0. Përcakto faqen aktuale dhe user-in
-// ===============================
-const currentPage = window.location.pathname.split("/").pop(); // merr emrin e file-it aktual
-let currentUser = localStorage.getItem("currentUser"); // merr user-in e loguar
-let users = JSON.parse(localStorage.getItem("users")) || []; // array me user-at
-let posts = JSON.parse(localStorage.getItem("posts")) || []; // array me postimet
-let comments = JSON.parse(localStorage.getItem("comments")) || []; //array me komentet
+function renderLastThreeComments() { 
+    const postId = Number(localStorage.getItem("selectedPost")); 
+    
+    const sortedComments = comments.sort((a, b) => b.id - a.id); 
 
-function profileHeaderName(){
-    const profileHeaderName = document.querySelector(".profile-header-name"); //marrim elementin nga DOM
-    const iconGuest = document.querySelector(".icon-guest");
-    const iconLoggedIn = document.querySelector('.icon-logged-in');
-    if(!profileHeaderName) return;
-    if(profileHeaderName) {
-        if(currentUser){
-            profileHeaderName.innerText = currentUser; //zevendesojme tekstin e brendshem me current user
-        } else {
-            profileHeaderName.innerText = `Guest`;
-            iconGuest.style.display = 'block';
-            iconLoggedIn.style.display = 'none'
-        };
-    }
+    const lastThreeComments = sortedComments.slice(0, 3); 
+
+    const commentsContainer = document.querySelector(".latest-comments-container");
+
+    commentsContainer.innerHTML = ""; 
+
+    lastThreeComments.forEach((comment) => { 
+      const relatedPost = posts.find((p) => Number(p.id) === Number(comment.postId));
+      
+      const postAuthor = relatedPost ? relatedPost.author : "Unknown"; 
+
+      const commentDiv = document.createElement("div"); 
+      commentDiv.classList.add("single-comment"); 
+
+      commentDiv.innerHTML = `
+        <i class="fa-solid fa-circle-user"></i>
+        <span class="profile-header-name">
+            ${comment.author} to ${postAuthor} 
+        </span>
+        <p class="comment-date">${comment.date} at ${comment.time}</p>
+        <p>${comment.comment}</p>
+    `; 
+      commentsContainer.appendChild(commentDiv);
+    });
+  }
+function goTo(page){ 
+    window.location.href = page; 
 };
-document.addEventListener('DOMContentLoaded', profileHeaderName); //kur te behet reload faqja te ekzekutohet ky kod
 
-    if(currentUser){
-        const loginLink = document.getElementById('login-link');
-        if(loginLink){
-        loginLink.style.display = 'none';
-        }
+function getPostImage(post) { 
+  return post.image && post.image.trim() !== "" 
+    ? post.image 
+    : "images/nophotoimage.avif"; 
+}
+
+function getPostComments(postId) { 
+  return comments.filter(c => c.postId === postId); 
+}
+
+function profileHeaderName() { 
+  const profileHeaderName = document.querySelector(".profile-header-name"); 
+  const iconGuest = document.querySelector(".icon-guest"); 
+  const iconLoggedIn = document.querySelector(".icon-logged-in"); 
+  if (!profileHeaderName) return; 
+  if (profileHeaderName) { 
+    if (currentUser) { 
+      profileHeaderName.innerText = currentUser; 
+    } else { 
+      profileHeaderName.innerText = `Guest`;
+      iconGuest.style.display = "block"; 
+      iconLoggedIn.style.display = "none"; 
     }
+  }
+}
+document.addEventListener("DOMContentLoaded", profileHeaderName);
 
-    function updateMenuUI() {
-    if (!currentUser) {
-        const logoutLink = document.querySelector('.logout-link');
-        if (logoutLink) logoutLink.style.display = 'none';
-    }
-    }
+if (currentUser) { 
+  const loginLink = document.getElementById("login-link");
+  if (loginLink) {
+    loginLink.style.display = "none"; 
+  }
+}
 
-// ===============================
-// 1. REGISTER PAGE
-// ===============================
-if (currentPage === "register.html") { //kontrollojme nese ndodhemi ne registe.html page
-    const form = document.querySelector("form"); //marrim elementet form nga kjo faqe
-
-    form.addEventListener("submit", function(e){ //pasi te bejme submit te ekzekutohet ky funksioni me poshte
-        e.preventDefault();
-
-        const usernameInput = document.getElementById('username');
-        const username = usernameInput.value; 
-        
-        const email = document.getElementById("email").value; 
-
-        const passwordInput = document.getElementById("password");
-        const password = passwordInput.value.trim(); //marrim vleren e password nga inputi
-
-        const confirmPasswordInput = document.getElementById("confirm-password");
-        const confirmPassword = confirmPasswordInput.value.trim();
-
-        const errorMsgForMatchingPass = document.getElementById("password-match");
-        const errorMsgForUsernameFormat = document.getElementById('username-requirements')
-        
-        //kontrolli nese te passwordet perputhen
-        if (password !== confirmPassword) {
-            errorMsgForMatchingPass.style.visibility = 'visible';
-            confirmPasswordInput.style.borderBottomColor = 'red'; 
-        return;
-        };
-
-        //kushti per username
-        const usernameRegex = /^[A-Z][A-Za-z0-9._\- ]{2,}$/;
-        if (!usernameRegex.test(username)) {
-            errorMsgForUsernameFormat.style.visibility = 'visible'
-            usernameInput.style.borderBottomColor = 'red';
-            return;
-        }
-        
-        //kushti per password
-        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
-        if (!passwordRegex.test(password)) {
-            showError("Password must be at least 8 characters long, include 1 uppercase letter and 1 number.");
-            return;
-        };
-
-        const exist = users.find(u => u.username === username); //kerkojme nje username nga DB dhe e krahasojme me vleren e inputit qe morem mesiper
-        if(exist){ //nqs gjejme ndonje elemente dhe ploteson kushtin
-            alert("Username already exists"); //printojme "username already exists"
-            return; //nqs nuk gjejme atehere e shtojme ne DB vleren e marre
-        }
-
-        const newUser = { //krijojme nje obejct te ri me emrin newUser me keto properties
-            username,
-            email,
-            password,
-            memberSince: new Date().toLocaleDateString(), // ruaj daten e regjistrimit
-            profilePic: "" // foto e profilit qe mund te vendoset me vone
-        };
-
-        users.push(newUser); //shtojme userin e ri ne DB users
-        localStorage.setItem("users", JSON.stringify(users)); // kthen users ne string JSON per ta ruajtur ne localStorage
-        localStorage.setItem("currentUser", username); //ruan vleren username me emrin currentUser
-
-        window.location.href = "index.html"; //te dergon te faqja kryesore
-    });
+if (!currentUser) { 
+  const logoutLink = document.querySelector(".logout-link");
+  if (logoutLink) logoutLink.style.display = "none"; 
 }
 
 
-// ===============================
-// 2. LOGIN PAGE
-// ===============================
-if (currentPage === "login.html") { //kerkojme nese jemi ne login.html page
+if (currentPage === "register.html") { 
+  const form = document.querySelector("form"); 
 
-    const form = document.querySelector("form"); //marrim elementin form nga DOM i kesaj faqeje
-    const usernameInput = document.getElementById("username"); //marrim elementin me id username 
-    const passwordInput = document.getElementById("password"); //marrim elementin me id password
-    const errorMsg = document.getElementById("incorrectusername"); //marrim elementin me id incorrectusername
+  form.addEventListener("submit", function (e) { 
+    
+    e.preventDefault();
 
-    function showLoginError() { //nqs kemi error te ekzekutohen keto CSS
-        usernameInput.style.borderBottom = '1px solid red';
-        passwordInput.style.borderBottom = '1px solid red';
-        errorMsg.style.visibility = 'visible';
+    const usernameInput = document.getElementById("username");
+    const username = usernameInput.value;
+
+    const email = document.getElementById("email").value;
+
+    const passwordInput = document.getElementById("password");
+    const password = passwordInput.value.trim(); 
+
+    const confirmPasswordInput = document.getElementById("confirm-password");
+    const confirmPassword = confirmPasswordInput.value.trim();
+
+    const errorMsgForMatchingPass = document.getElementById("password-match");
+    const errorMsgForUsernameFormat = document.getElementById("username-requirements");
+
+    if (password !== confirmPassword) { 
+      errorMsgForMatchingPass.style.visibility = "visible";
+      confirmPasswordInput.style.borderBottomColor = "red";
+      return; 
+    }
+ 
+    const usernameRegex = /^[A-Z][A-Za-z0-9._\- ]{2,}$/;
+    if (!usernameRegex.test(username)) { 
+      errorMsgForUsernameFormat.style.visibility = "visible";
+      usernameInput.style.borderBottomColor = "red";
+      return; 
     }
 
-    function clearLoginError() { //kur fillojme te shkruajme te ekzekutohen keto CSS
-        usernameInput.style.borderBottom = '';
-        passwordInput.style.borderBottom = '';
-        errorMsg.style.visibility = 'hidden';
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
+    if (!passwordRegex.test(password)) {
+      alert(
+        "Password must be at least 8 characters long, include 1 uppercase letter and 1 number.",
+      );
+      return; 
     }
 
-    usernameInput.addEventListener('input', clearLoginError); //sa fillojme te shkruajme ekzekutohet funksioni i ndertuar mesiper clearLoginError
-    passwordInput.addEventListener('input', clearLoginError);
-
-    form.addEventListener("submit", function(e){
-        e.preventDefault();
-
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
-
-        const user = users.find(u => u.username === username && u.password === password);
-
-        if(user){
-            localStorage.setItem("currentUser", username);
-            window.location.href = "index.html";
-        } else {
-            showLoginError();
-        }
-    });
-}
-
-
-
-// ===============================
-// 3. LOGOUT ICON (për të gjitha faqet)
-// ===============================
-const logoutIcon = document.querySelector(".fa-right-to-bracket"); //marrim ikonen nga DOM
-if(logoutIcon){ 
-    logoutIcon.addEventListener("click", function(){ //nqs klikojme ikonen (click => eventi , funksioni qe do kryhet)
-        localStorage.removeItem("currentUser"); //heqim currentUser nga localStorage
-        window.location.href = "login.html"; //te dergon tek faqja e LOGIN
-    });
-}
-
-// ===============================
-// 4. CREATE POST PAGE
-// ===============================
-if (currentPage === "create-post.html") { //kontrollojme nese jemi tek create-post.html file
-    const form = document.querySelector("form"); //marrim form nga DOM
-
-    form.addEventListener("submit", function(e){ //kur bejme submit tek form te ekzekutohet kodi me poshte
-        e.preventDefault(); //i ndalojme qe beri refresh faqes
-
-        const title = document.getElementById("title").value; //marrim vleren e titullit
-        const description = document.getElementById("description").value; //marrim vleren e komentit ose pershkrimit
-        const file = document.getElementById("image").files[0]; //marrim file-n e zgjedhur (ne kete rast foton)
-        const category = document.getElementById("categories").value;
-
-        if(!currentUser){ //nqs nuk eshte nje user
-            alert("Please login first"); //shfaqim tabele qe duhet qe logohemi
-            window.location.href = "login.html"; //te dergon tek login page
-            return; //nese svendosim RETURN kodi me poshte do te ekzekutohet edhe pse ne vendosem nje kusht
-        }
-
-        const datePosted = new Date();
-        const formattedDate = datePosted.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-        });
-        const formattedTime = datePosted.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true
-        });
-
-        const createPost = (image) => { //krijojme nje function me parameter image
-            const newPost = { // krijojme nje object te ri me emrini newPost
-            id: Date.now(), // id e postit eshte koha kur ajo eshte postuar
-            title, //titulli i cili do ruaj vleren e inputit me id="title"
-            category, //kategoria qe zgjedhim nga select
-            comments,
-            description, //description i cili do ruaj vleren e inputit me id="descriptiom"
-            image: image || "", //image merret nga file i uploduar , nese skemi uploduar gje e lejme bosh
-            author: currentUser, //autori eshte currentUser pra useri i cili po perdor faqen ne keto momente
-            date: formattedDate, //data ne te cilen eshte postuar posti
-            time: formattedTime //ora kur eshte krijuar posti
-        };
-
-    // Shto postin ne posts global
-    posts.push(newPost); //shtojme postin e ri ne databaze
-    localStorage.setItem("posts", JSON.stringify(posts)); //e kthejme ne JSON string per ta ruajtur ne local storage
-
-    // Shto postin edhe ne array-n e user-it
-    const user = users.find(u => u.username === currentUser); //tek array users kerkojme username qe perputhet me currentUser
-    if (user) { //nese ekziston ky username
-        if (!user.posts) user.posts = []; //kontrollojme nese nuk ka poste te meparshme krijojme nje array bosh per te vendosur kete post
-        user.posts.push(newPost); //vendosim postim ne array
-        localStorage.setItem("users", JSON.stringify(users)); //ruajme postin ne localStorage
-    }
-        window.location.href = "index.html"; // kthehemi tek homepage nese ky kod eshte ekzekutuar me sukses
+    const exist = users.find((u) => u.username === username); 
+    if (exist) { 
+      alert("Username already exists"); 
+      return; 
     }
 
-
-        if(file){ //kontrollon nese kemi zgjedhur nje file
-            const reader = new FileReader(); // FileReader() eshte nje objekt i cili lexon file ne menyre asinkrone
-            reader.onload = function(){ // thirret kur leximi i file-t perfundon
-                createPost(reader.result); //(reader.result) => permban te dhenat e file ne forme string base64 //createPost(reader.result) => i dergon funksionit createPost imazhin qe lexuam
-            }
-            reader.readAsDataURL(file); // e kthen file ne DataURL
-        } else {
-            createPost(""); // nese skemi zgjedhur foto atere hedh postin pa foto
-        }
-    });
-
-    //LIMIT LENGTH OF POST
-    function setupCharCounter(inputId, counterId) {
-    const input = document.getElementById(inputId);
-    const counter = document.getElementById(counterId);
-    const max = input.getAttribute('maxlength');
-
-    counter.textContent = `0 / ${max}`;
-
-    input.addEventListener('input', () => {
-        const currentLength = input.value.length;
-        counter.textContent = `${currentLength} / ${max}`;
-    });
-    }
-
-    // Përdor funksionin për çdo input/textarea
-    setupCharCounter('title', 'post-title-count');
-    setupCharCounter('description', 'post-description-count');
-}
-
-  
-
-    const noPost = document.querySelector('.no-posts');
-    const myPosts = posts.filter(p => p.author === currentUser);
-    if(posts.length > 0){
-        if(noPost){
-            noPost.style.display = 'none';
-        }
-    } else {
-        noPost.style.display = 'block'
-    }
-    if(currentPage === 'profile.html'){
-        if(myPosts.length > 0){  
-            noPost.style.display = 'none';
-        } else {
-            noPost.style.display = 'block'
-        };
+    const newUser = { 
+      username, 
+      email,
+      password,
+      memberSince: new Date().toLocaleDateString(), 
+      profilePic: "", 
     };
 
+    users.push(newUser);  
+    localStorage.setItem("users", JSON.stringify(users)); 
+    localStorage.setItem("currentUser", username); 
 
-// ===============================
-// 5. HOME PAGE (index.html) - Shfaqja e postimeve
-// ===============================
-if (currentPage === "index.html") { //kontrollon nese jemi ne index.html page
-    const cardsContainer = document.querySelector(".cards"); //marrim cards(postimet) nga DOM
+    goTo("index.html"); 
+  });
+}
 
-    function renderPosts(filteredPosts){ //krijojme nje funksion me parameter filteredPosts
-        cardsContainer.innerHTML = ""; //boshatisim permbajtjen e vendit te postimeve
+if (currentPage === "login.html") { 
+  const form = document.querySelector("form"); 
+  const usernameInput = document.getElementById("username"); 
+  const passwordInput = document.getElementById("password"); 
+  const errorMsg = document.getElementById("incorrectusername"); 
 
-        filteredPosts.forEach(post => { //cdo element ruhet ne filteredPost dhe ekzekuton kete kod per secilin post
-            const card = document.createElement("div"); //krijojme nje element te ri div
-            card.classList.add("cardpost"); //i shtojme classen cardpost qe e kemi edituar ne CSS
+  function showLoginError() {
+    usernameInput.style.borderBottom = "1px solid red";
+    passwordInput.style.borderBottom = "1px solid red";
+    errorMsg.style.visibility = "visible";
+  }
 
-            // 🔹 Nese nuk ka foto, vendosim nje default
-            const imageSrc = post.image && post.image.trim() !== "" //kontrollon nese kemi zgjedhur post , trim() heq hapesirat brenda stringut
-                ? post.image //nese kemi post atehere vendosim postin
-                : "images/nophotoimage.avif"; //nese skemi post vendosim kete foto si default
+  function clearLoginError() { 
+    usernameInput.style.borderBottom = "";
+    passwordInput.style.borderBottom = "";
+    errorMsg.style.visibility = "hidden";
+  }
 
-            card.innerHTML = `
+  usernameInput.addEventListener("input", clearLoginError); 
+  passwordInput.addEventListener("input", clearLoginError);
+
+  form.addEventListener("submit", function (e) { 
+    e.preventDefault(); 
+
+    const username = usernameInput.value.trim(); 
+    const password = passwordInput.value.trim(); 
+
+    const user = users.find((u) => u.username === username && u.password === password); 
+
+    if (user) { 
+      localStorage.setItem("currentUser", username); 
+      goTo("index.html"); 
+    } else {
+      showLoginError(); 
+    }
+  });
+}
+
+const logoutIcon = document.querySelector(".fa-right-to-bracket"); 
+if (logoutIcon) { 
+  logoutIcon.addEventListener("click", function () { 
+    localStorage.removeItem("currentUser"); 
+    goTo("login.html"); 
+  });
+}
+
+if (currentPage === "create-post.html") { 
+  const form = document.querySelector("form"); 
+
+  form.addEventListener("submit", function (e) { 
+    e.preventDefault(); 
+
+    const title = document.getElementById("title").value;  
+    const description = document.getElementById("description").value; 
+    const file = document.getElementById("image").files[0]; 
+    const category = document.getElementById("categories").value;
+
+    if (!currentUser) { 
+      alert("Please login first"); 
+      goTo("login.html"); 
+      return; 
+    }
+
+    const datePosted = new Date(); 
+    const formattedDate = datePosted.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const formattedTime = datePosted.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    const createPost = (image) => { 
+      const newPost = { 
+        id: Date.now(), 
+        title, 
+        category, 
+        comments: [], 
+        description, 
+        image: image || "", 
+        author: currentUser, 
+        date: formattedDate, 
+        time: formattedTime, 
+      };
+
+      
+      posts.push(newPost); 
+      localStorage.setItem("posts", JSON.stringify(posts)); 
+      
+      const user = users.find((u) => u.username === currentUser); 
+      if (user) {
+        if (!user.posts) user.posts = []; 
+        user.posts.push(newPost); 
+        localStorage.setItem("users", JSON.stringify(users)); 
+      }
+      goTo("index.html"); 
+    };
+
+    if (file) {
+      const reader = new FileReader(); 
+      reader.onload = function () {
+        createPost(reader.result); 
+      };
+      reader.readAsDataURL(file); 
+    } else {
+      createPost(""); 
+    }
+  });
+  
+  function setupCharCounter(inputId, counterId) { 
+    const input = document.getElementById(inputId); 
+    const counter = document.getElementById(counterId);
+    const max = input.getAttribute("maxlength"); 
+
+    counter.textContent = `0 / ${max}`; 
+
+    input.addEventListener("input", () => { 
+      const currentLength = input.value.length; 
+      counter.textContent = `${currentLength} / ${max}`; 
+    });
+  }
+
+  setupCharCounter("title", "post-title-count"); 
+  setupCharCounter("description", "post-description-count");
+}
+
+const noPost = document.querySelector(".no-posts"); 
+const myPosts = posts.filter((p) => p.author === currentUser); 
+if (posts.length > 0) { 
+  if (noPost) { 
+    noPost.style.display = "none";
+  }
+} else {
+  noPost.style.display = "block"; 
+}
+
+
+if (currentPage === "index.html") { 
+  const cardsContainer = document.querySelector(".cards"); 
+
+  function renderPosts(filteredPosts) { 
+    cardsContainer.innerHTML = "";  
+
+    filteredPosts.forEach((post) => { 
+      const card = document.createElement("div"); 
+      card.classList.add("cardhome");  
+
+      const imageSrc = getPostImage(post); 
+
+      card.innerHTML = `
             <div class="post-header">
                 <div class="post-meta">
                     <i class="fa-solid fa-circle-user"></i>
@@ -305,115 +309,137 @@ if (currentPage === "index.html") { //kontrollon nese jemi ne index.html page
                     <p>${post.title}</p>
                     <div class="msgviewicon">
                         <i class="fa-regular fa-eye"></i><p>2</p>
-                        <i class="fa-regular fa-message"></i><p>3</p>
+                        <i class="fa-regular fa-message" title="comments"></i></i><p class="comments-count-icon">3</p>
                     </div>
                 </div>
-                <p id="comment-text">${post.description}</p>
+                <p class="comment-text">${post.description}</p>
             `;
+      const commentIcon = card.querySelector(".comments-count-icon"); 
+      const postComments = getPostComments(post.id); 
+      commentIcon.textContent = `${postComments.length}`;
 
-            card.addEventListener("click", () => { //kur klikojme mbi post
-                localStorage.setItem("selectedPost", post.id); //ne localStorage ruhet id e ketij posti me emrin(key) selectedPost
-            });
-
-            cardsContainer.appendChild(card); //elementin div qe krijuam e shtojme tek elementi i DOM qe e kemi marr ne fillim te funkstionit
-        });
-
-    }
+      const messageLogo = card.querySelector(".fa-message");
+      messageLogo.addEventListener("click", (e) => {
         
-    const create = document.getElementById('createPostBtn') //marrim nga DOM elementin me id="createPostBtn"
-    create.addEventListener('click' , function() { //kur ta klikojme kete buton te ekzekutohet kodi me poshte
-    window.location.href = 'create-post.html' //pra kur te klikojme kete buton te na dergoje ne kete faqe
-    })
+        e.stopPropagation();
+        localStorage.setItem("selectedPost", post.id); 
+        goTo("post.html");
+      });
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".fa-message")) {
+          localStorage.removeItem("selectedPost");
+        }
+      });
 
-    renderPosts(posts); //therrasim kete kod per te shfaqur postimet ne DOM
-
-    // ===============================
-    // 5a. SEARCH
-    // ===============================
-    const searchInput = document.querySelector(".searchbar-search input"); //marrim iputin nga DOM
-    searchInput.addEventListener("input", function(){ //i shtojme nje event qe te kryeje funksionin me poshte
-        const query = this.value.toLowerCase(); //merr vleren e inputit dhe e kthen ne lower case
-        const filtered = posts.filter(p => // filter() => kalon neper cdo element dhe krijon nje array te ri me ato qe plotesojne kushtin
-            p.title.toLowerCase().includes(query) || 
-            p.description.toLowerCase().includes(query)  // nese title ose description perban fjalen e kerkuar , futet te filter
-        );
-        renderPosts(filtered); //merr listen e kerkuar dhe e shfaq ne ekran
+      cardsContainer.appendChild(card); 
     });
+  }
 
-    // ===============================
-    // 5b. FILTER "My Posts"
-    // ===============================
-    const myPostsBtn = document.querySelector(".searchbar-categories ul li:nth-child(3) a"); //merr vleren e 3 te listes nga DOM
-    myPostsBtn.addEventListener("click", function(e){ //i shtojme eventin click kesaj vlere per te kryere funksionin me poshte
-        e.preventDefault(); // ndalojme se beri refresh
-        const postCategories = document.getElementById('post-categories')
-        postCategories.innerHTML = 'My Posts';
-        const myPosts = posts.filter(p => p.author === currentUser); //filtrojme postet kur plotesohet ky kusht (autori = userin)
-        renderPosts(myPosts); //shfaqim postet ne ekran 
+  const create = document.getElementById("createPostBtn"); 
+  create.addEventListener("click", function () {
+    
+    goTo("create-post.html"); 
+  });
+
+  renderPosts(posts); 
+
+ 
+  const searchInput = document.querySelector(".searchbar-search input"); 
+  searchInput.addEventListener("input", function () {
+    
+    const query = this.value.toLowerCase(); 
+    const filtered = posts.filter(
+      (
+        p, 
+      ) =>
+        p.title.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query), 
+    );
+    renderPosts(filtered); 
+  });
+
+ 
+  const myPostsBtn = document.querySelector(
+    ".searchbar-categories ul li:nth-child(3) a",
+  ); 
+  myPostsBtn.addEventListener("click", function (e) {
+    
+    e.preventDefault(); 
+    const postCategories = document.getElementById("post-categories");
+    postCategories.innerHTML = "My Posts";
+    const myPosts = posts.filter((p) => p.author === currentUser); 
+    renderPosts(myPosts); 
+  });
+
+ 
+  const allPostsBtn = document.querySelector(
+    ".searchbar-categories ul li:nth-child(2) a",
+  ); 
+  allPostsBtn.addEventListener("click", function (e) {
+    
+    e.preventDefault(); 
+    const postCategories = document.getElementById("post-categories");
+    postCategories.innerHTML = "All Posts";
+    renderPosts(posts); 
+  });
+ 
+  const links = document.querySelectorAll(".dropdown-content a");
+  const cards = document.querySelectorAll(".cardpost");
+
+  links.forEach((link) => {
+    link.addEventListener("click", function (e) {
+      e.preventDefault(); 
+
+      const category = this.dataset.category; 
+
+      const categories = posts.filter((p) => p.category === category); 
+      const postCategories = document.getElementById("post-categories");
+      postCategories.innerHTML = `${category}`;
+      renderPosts(categories);
     });
-
-    // ===============================
-    // 5c. FILTER "All Posts"
-    // ===============================
-    const allPostsBtn = document.querySelector(".searchbar-categories ul li:nth-child(2) a");//merr vleren e 2 te lsites nga DOM
-    allPostsBtn.addEventListener("click", function(e){ //i shtojme eventin click per te kryer kete funksion kur e klikojme
-        e.preventDefault(); //ndalojme se beri refresh
-        const postCategories = document.getElementById('post-categories')
-        postCategories.innerHTML = 'All Posts';
-        renderPosts(posts); //thjeshte shfaqim te gjitha postimet
-    });
-    // ===============================
-    // 5c. FILTER "CATEGORIES"
-    // ===============================
-    const links = document.querySelectorAll('.dropdown-content a');
-    const cards = document.querySelectorAll('.cardpost');
-
-    links.forEach(link => {
-    link.addEventListener('click', function(e) {
-        e.preventDefault(); // mos e ndjek linkun
-
-        const category = this.dataset.category; // merr kategorinë e linkut
-
-        const categories = posts.filter(p => p.category === category); //filtrojme postet kur plotesohet ky kusht (autori = userin)
-        const postCategories = document.getElementById('post-categories')
-        postCategories.innerHTML = `${category}`;
-        renderPosts(categories); 
-    });
-    });
+  });
+  renderLastThreeComments();
+  document.addEventListener("DOMContentLoaded", () => {
+    renderLastThreeComments();
+  });
 }
 
-// ===============================
-// 6. PROFILE PAGE
-// ===============================
-if(currentPage === "profile.html") { //kontrollojme nese jemi ne kete faqe
-    if(!currentUser){
-        const guestProfile = document.querySelector('.profile-content');
-        guestProfile.innerHTML = `<div class="guest-box">
+
+if (currentPage === "profile.html") {
+
+  if (myPosts.length > 0) {
+    noPost.style.display = "none";
+  } else {
+    noPost.style.display = "block";
+  }
+  
+  if (!currentUser) {
+    const guestProfile = document.querySelector(".profile-content");
+    guestProfile.innerHTML = `<div class="guest-box">
                                     <p class="guest-message">You’re currently browsing as a guest. Please log in to view your profile.</p>
                                     <button class="login-btn" type="click">Login</button>
                                 </div>
-                                `
+                                `;
 
-        const loginBtn = document.querySelector('.login-btn');
-        loginBtn.addEventListener('click' , function() {
-        window.location.href = 'login.html'
-        });
-    };
-    
-    if(currentUser){
-        const cardsContainer = document.querySelector(".cards-profile"); //marrim elementin cards-profile nga DOM
-        const myPosts = users.find(u => u.username === currentUser)?.posts || []; //kotrnollon nese useri aktual ka postime
-        cardsContainer.innerHTML = ""; //boshatis elementin sepse kemi pasur elemente default si shembull
+    const loginBtn = document.querySelector(".login-btn");
+    loginBtn.addEventListener("click", function () {
+        goTo("login.html");
+    });
+  }
 
-        myPosts.forEach((post, index) => { // per cdo element ekzekutojme kodin me poshte
-            const card = document.createElement("div"); //krijojme nje element te ri 
-            card.classList.add("cardpost-profile"); // i shtojme kete class te cilen e kemi edituar me pare ne CSS
+  if (currentUser) {
+    const cardsContainer = document.querySelector(".cards-profile"); 
+    const myPosts = users.find((u) => u.username === currentUser)?.posts || []; 
+    cardsContainer.innerHTML = ""; 
 
-            const imageSrc = post.image && post.image.trim() !== "" // e njejta gje kontrollojme nese kemi foto apo jo
-                        ? post.image
-                        : "images/nophotoimage.avif"; 
+    myPosts.forEach((post, index) => {
+      
+      const card = document.createElement("div"); 
+      card.classList.add("cardpost-profile"); 
 
-            card.innerHTML = `
+      const imageSrc = getPostImage(post);
+
+      card.innerHTML = `
                 <div class="cardpost-profile">
                     <div class="editcardpost">
                         <div class="edit-delte-btns"> 
@@ -426,322 +452,418 @@ if(currentPage === "profile.html") { //kontrollojme nese jemi ne kete faqe
                         <p>${post.title}</p>
                     <div class="msgviewicon">
                         <i class="fa-regular fa-eye"></i><p>2</p>
-                        <i class="fa-regular fa-message" title="comments"></i><p>3</p>
+                        <i class="fa-regular fa-message" title="comments"></i><p class="comments-count-icon">3</p>
                     </div>
                     </div>
-                    <p id="comment-text">${post.description}</p>
+                    <p class="comment-text">${post.description}</p>
                 </div>
                 
             `;
-        cardsContainer.appendChild(card); //shtojme elementin ne DOM
+      cardsContainer.appendChild(card); 
 
-        // ===============================
-        // DELETE POST
-        // ===============================
-        const deleteBtn = card.querySelector(".delete-btn"); //marrim elementin nga DOM
-        deleteBtn.addEventListener("click", () => { //pasi te klikojme butonin te ekzekutohet ky kod
-            if(confirm("Are you sure you want to delete this post?")){ //nese konfirmojme kete atehere te ekzekutohet ky kod
-                
-                myPosts.splice(index, 1); //fshin posts nga user.posts
+      const postComments = getPostComments(post.id)
+      const commentIcon = card.querySelector(".comments-count-icon");
+      commentIcon.textContent = `${postComments.length}`;
 
-                const globalIndex = posts.findIndex(p => p.id === post.id); //gjejme indexin e postimin me kushtin e dhene
-                if(globalIndex !== -1) posts.splice(globalIndex, 1); //nqs e kemi gjetur e fshijme nga array
-
-                localStorage.setItem("users", JSON.stringify(users)); //ruajme ndryshimet ne localStorage
-                localStorage.setItem("posts", JSON.stringify(posts));
-
-                card.remove(); //fshijme card nga DOM
-
-                const postsCommentsEl = document.getElementById("posts-comments"); //marrim nga DOM elemtin me id="posts-comment"
-                if(postsCommentsEl) postsCommentsEl.innerText = `${myPosts.length} Posts | 0 Comments`; //ndryshojme numrin e postimeve ne profil
-            }
-        });
-
-        // ===============================
-        // EDIT POST
-        // ===============================
-        const editBtn = card.querySelector(".edit-btn"); //marrim nga DOM buttonin edit
-        editBtn.addEventListener("click", () => { // kur te klikojme butonin te ekzekutohet kodi meposhte
-            const newTitle = prompt("Edit title:", post.title); //nxjerr nje prompt dhe vendos titullin e postit si default
-            const newDescription = prompt("Edit description:", post.description); //nxjerr nje prompt dhe vendos pershkrimin si default
-
-            if(newTitle !== null) post.title = newTitle; //nqs titulli i ri qe do vendoset eshte i ndryshem nga null , atehere e ndryshojme titullin me vleren e inputit prompt
-            if(newDescription !== null) post.description = newDescription; //nqs pershkrimi i ri qe do vendoset eshte i ndryshem nga null , atehere e ndryshojme pershkrimin me vleren e inputit prompt
-
-            card.querySelector(".insidecards p").innerText = post.title; //vlerat e ruajtura mesiper jane ne localStorage keshtu qe i vendosim vlerat e reja ne DOM
-            card.querySelector("#comment-text").innerText = post.description;
-
-            const globalPost = posts.find(p => p.id === post.id); //gjejme postin me kete id
-            if(globalPost){ //nese e gjejme
-                globalPost.title = post.title; //i ndryshojme titullin
-                globalPost.description = post.description; //i ndryshojme pershkrimin
-            }
-
-            localStorage.setItem("users", JSON.stringify(users)); //ruajme ndryshimet ne localStorage
-            localStorage.setItem("posts", JSON.stringify(posts));
-        });
+     
+      const deleteBtn = card.querySelector(".delete-btn"); 
+      deleteBtn.addEventListener("click", () => {
         
-    });
-    const create = document.getElementById('createPostBtn')
-    create.addEventListener('click' , function() {
-    window.location.href = 'create-post.html'
-    })
+        if (confirm("Are you sure you want to delete this post?")) {
+          myPosts.splice(index, 1); 
 
-}
+          const globalIndex = posts.findIndex((p) => p.id === post.id); 
+          if (globalIndex !== -1) posts.splice(globalIndex, 1); 
 
-    
+          localStorage.setItem("users", JSON.stringify(users)); 
+          localStorage.setItem("posts", JSON.stringify(posts));
 
-    // ===============================
-    // Profile info
-    // ===============================
-    const usernameEl = document.getElementById("profile-username"); //marrim elementin nga DOM me ID #profile-username
-    const memberEl = document.getElementById("member-since"); //marrim elementin nga DOM me ID #member-since
-    const postsCommentsEl = document.getElementById("posts-comments"); //marrim elementin nga DOM me ID #posts-comments
-    const profilePicEl = document.getElementById("profile-pic"); //marrim elementin nga DOM me ID #profile-pic
+          card.remove(); 
 
-    if(currentUser){ //ne qofte kemi userin konkret ekzekutojme kete kod
-        const myPosts = users.find(u => u.username === currentUser)?.posts || [];
-        const user = users.find(u => u.username === currentUser); //marrim nja username nga DB dhe e krahasojme me currentUser
-        usernameEl.innerText = user.username; //vendsoim vleren ne elemetin me ID #profile-username
-        memberEl.innerText = `Member since ${user.memberSince || "July 2025"}`; //marrim vleren memberSince nga DB
-
-        postsCommentsEl.innerText = `${myPosts.length} Posts | ${user.comments.length} Comments`; //myPosts.length tregon se sa postime ka 
-
-        if(user.profilePic) profilePicEl.src = user.profilePic; //kontrollon nese ka nje profilePic te ruajtur ,nese po e vendos
-    }
-}
-
-const textElement = document.getElementById("typing-text"); //marrim nga DOM elemtin me id="typing-text"
-
-if (textElement) { //nqs e gjejme elemntin ekzekutojme kodin me poshte
-const username = localStorage.getItem("username") || "Guest"; //marrim nga localStorage usernamin , nese ska vendosim Guest
-const text = `Hi, Welcome ${currentUser}`; //teksti qe do shfaqet
-
-textElement.innerText = ""; //boshatisim elementin nqs kemi vlera brenda
-
-let index = 0; // krijojme nje variabel te ndryshueshme me default 0
-
-function type() { 
-    if (index < text.length) { //nqs 0 eshte me e vogel se gjatesia e tekstit qe do shfaqet
-    textElement.innerText += text[index]; //shton shtronjen e rradhes
-    index++;
-    setTimeout(type, 150); //shton cdo shtonje cdo 150ms
-    }
-}
-
-window.addEventListener("load", type); //te ekzekutohet cdo here kur bejme refresh
-}
-
-
-const profilePostsBy = document.getElementById('profilePostsBy')
-if(profilePostsBy){                                      //perdorim if state sepse kur jemi ne ndonje faqe tjeter qe se ka kete element
-    profilePostsBy.innerText = `Posts By ${currentUser}` //atehere do te na shfaqi error sepse nuk e gjen kete element
-}                                                        
-
-// ===============================
-// 7. POST DETAIL PAGE (post.html)
-// ===============================
-if (currentPage === "post.html") { //kontrollojme nese jemi ne kete faqe
-    const cardsContainer = document.querySelector(".cards"); //marrim kete element nga DOM
-
-    if (cardsContainer) { //nqs ky elemnt ekziston te kryhet funksioni i meposhtem
-        function renderPosts(filteredPosts) {
-            cardsContainer.innerHTML = "";
-            filteredPosts.forEach(post => {
-                const card = document.createElement("div");
-                card.classList.add("cardpost");
-
-                const imageSrc = post.image && post.image.trim() !== ""
-                    ? post.image
-                    : "images/nophotoimage.avif";
-
-                card.innerHTML = `
-                    <div class="post-header">
-                        <div class="post-meta">
-                            <i class="fa-solid fa-circle-user"></i>
-                            <div class="post-info">
-                                <h3>${post.author}</h3>
-                                <p>${post.date} at ${post.time}</p>
-                            </div>
-                        </div>
-                        <img src="${imageSrc}" alt="Post image">
-                    </div>
-                        <div class="insidecards">
-                            <p>${post.title}</p>
-                            <div class="msgviewicon">
-                                <i class="fa-regular fa-eye"></i><p>2</p>
-                                <i class="fa-regular fa-message"></i><p>3</p>
-                            </div>
-                        </div>
-                        <p id="comment-text">${post.description}</p>
-                `;
-
-                cardsContainer.appendChild(card);  //vendosim postet ne DOM njesoj si ne HOME PAGE
-            });
+          const postsCommentsEl = document.getElementById("posts-comments"); 
+          if (postsCommentsEl)
+            postsCommentsEl.innerText = `${myPosts.length} Posts | 0 Comments`; 
         }
-        renderPosts(posts);
-    }
-}
-// ===============================
-// 8. COMMENTS (post.html)
-// ===============================
+      });
 
-if (currentPage === "post.html") { //kontrollojme nese jemi ne keto dy faqe
-    const form = document.querySelector("form"); // marrim elementin form nga keto faqe
-    const commentsContainer = document.querySelector('.comments-container'); //marrim elementin me class comments-container i cili do mbaje komentet
-    const commentsCount = document.getElementById('comments-count'); //marrim elementin comments-count qe tregon numrin e komenteve
+     
+      const editBtn = card.querySelector(".edit-btn"); 
+      editBtn.addEventListener("click", () => {
+        
+        const newTitle = prompt("Edit title:", post.title); 
+        const newDescription = prompt("Edit description:", post.description); 
 
-    // Ngarko komentet nga storage në DOM kur faqja ngarkohet
-    document.addEventListener('DOMContentLoaded', function() { //kur faqja behet reload (pra i bejme refresh)
+        if (newTitle !== null) post.title = newTitle; 
+        if (newDescription !== null) post.description = newDescription; 
 
-        // Filtrimi për postin aktual
-        const postId = localStorage.getItem('selectedPost'); //marrim postin qe kemi klikuar
-        const postComments = comments.filter(c => c.postId === postId); //filtrojme komentet me keto id
+        card.querySelector(".insidecards p").innerText = post.title; 
+        card.querySelector(".comment-text").innerText = post.description;
 
-        commentsContainer.innerHTML = ''; //gjenerojme komentin me java script
-        postComments.forEach(comment => { //per secilin nga komentet qe kemi filtruar te gjeneroje kete html
-            const commentDiv = document.createElement('div');
-            commentDiv.classList.add('single-comment');
-            commentDiv.innerHTML = `
-                <i class="fa-solid fa-circle-user"></i>
-                <span class="profile-header-name">${comment.author}</span>
-                <p class="comment-date">${comment.date} at ${comment.time}</p>
-                <p>${comment.comment}</p>
-            `;
-            commentsContainer.appendChild(commentDiv); //shtojme elementin e krijuar ne DOM
-        });
+        const globalPost = posts.find((p) => p.id === post.id); 
+        if (globalPost) {
+          
+          globalPost.title = post.title; 
+          globalPost.description = post.description; 
+        }
 
-        commentsCount.innerHTML = `(${postComments.length})`; //perditesojme numerimin e komenteve
+        localStorage.setItem("users", JSON.stringify(users)); 
+        localStorage.setItem("posts", JSON.stringify(posts));
+      });
     });
+    const create = document.getElementById("createPostBtn");
+    create.addEventListener("click", function () {
+      goTo("create-post.html");
+    });
+  }
 
-    // Kontrolli dhe shtimi i komentit të ri
-    if (form) { //nqs kemi form 
-        form.addEventListener("submit", function(e) { //i shtojme nje event submit qe kur te ekzekutojme kete event te ekzekutohet funksioni me poshte
-            e.preventDefault(); //ndalojme se rifreskuari faqen
+ 
+  const usernameEl = document.getElementById("profile-username"); 
+  const memberEl = document.getElementById("member-since"); 
+  const postsCommentsEl = document.getElementById("posts-comments"); 
+  const profilePicEl = document.getElementById("profile-pic"); 
+  const totalComments = myPosts.reduce((acc, p) => acc + p.comments.length, 0);
 
-            const commentText = document.getElementById("comment-input").value.trim(); //marrim vleren e inputit te komentit
-            if (!currentUser) { //nqs nuk jemi nje user 
-                alert("Please login first"); //jep alert qe ne duhet te logohemi 
-                window.location.href = "login.html"; //dhe te dergon tek faqja per tu loguar
-                return; //nese jemi user thjeshte vazhdojme normalisht
-            }
-            if (!commentText) return; //kontroll nese inputi ka vlere apo eshte bosh
+  if (currentUser) {
+    
+    const myPosts = users.find((u) => u.username === currentUser)?.posts || [];
+    const user = users.find((u) => u.username === currentUser); 
+    usernameEl.innerText = user.username; 
+    memberEl.innerText = `Member since ${user.memberSince || "July 2025"}`; 
 
-            const datePosted = new Date();
-            const formattedDate = datePosted.toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
-            const formattedTime = datePosted.toLocaleTimeString("en-US", { hour:"2-digit", minute:"2-digit", hour12:true });
-            const postId = Number(localStorage.getItem("selectedPost"));
+    postsCommentsEl.innerText = `${myPosts.length} Posts | ${totalComments} Comments`; 
 
-            const newComment = { //krijojme nje koment te ri 
-                id: Date.now(), //id eshte data ne cilen eshte bere komenti
-                comment: commentText, //vlera e inputit
-                author: currentUser, //autori eshte useri i loguar momentalisht
-                postId: postId, //postId eshte posti qe kemi selektuar per te cilin po bejme komentin
-                date: formattedDate, // data e komentit
-                time: formattedTime //koha e komentit
-            };
+    if (user.profilePic) profilePicEl.src = user.profilePic; 
+  }
+}
 
-            comments.push(newComment); //shtojme komentin e ri ne array Comments 
-            localStorage.setItem('comments', JSON.stringify(comments)); //ruajme ndryshimet ne localStorage
+const textElement = document.getElementById("typing-text"); 
 
-            const userIndex = users.findIndex(u => u.username === currentUser); 
-            if (userIndex !== -1) {
-                if (!users[userIndex].comments) users[userIndex].comments = [];
-                users[userIndex].comments.push(newComment);
-                localStorage.setItem('users', JSON.stringify(users));
-            }
+if (textElement) {
+  
+  const username = localStorage.getItem("username") || "Guest"; 
+  const text = `Hi, Welcome ${currentUser}`; 
 
-            const commentDiv = document.createElement('div');
-            commentDiv.classList.add('single-comment');
-            commentDiv.innerHTML = `
-                <i class="fa-solid fa-circle-user"></i>
-                <span class="profile-header-name">${newComment.author}</span>
-                <p class="comment-date">${newComment.date} at ${newComment.time}</p>
-                <p>${newComment.comment}</p>
-            `;
-            commentsContainer.appendChild(commentDiv);
+  textElement.innerText = ""; 
 
-            const postCommentsCount = comments.filter(c => c.postId === postId).length;
-            commentsCount.innerHTML = `(${postCommentsCount})`;
+  let index = 0; 
 
-            document.getElementById("comment-input").value = "";
-        });
+  function type() {
+    if (index < text.length) {
+      
+      textElement.innerText += text[index]; 
+      index++;
+      setTimeout(type, 150); 
     }
+  }
+
+  window.addEventListener("load", type); 
+}
+
+const profilePostsBy = document.getElementById("profilePostsBy");
+if (profilePostsBy) {
+  
+  profilePostsBy.innerText = `Posts By ${currentUser}`; 
 }
 
 
-//MOBILE VERSION HAMBURGER MENU
-const hamburger = document.getElementById('hamburger');
-const menu = document.getElementById('menu');
-const close = document.getElementById('close');
-const overlay = document.getElementById('overlay');
+if (currentPage === "post.html") {
 
-if(hamburger){
-hamburger.addEventListener('click', () => {
-menu.style.right = '0';
-overlay.style.display = 'block';
-updateMenuUI();
-document.querySelectorAll('.profile-header-name').forEach(el => {
-    el.innerHTML = currentUser || 'Guest';
-})
-});
-}
+  const cardsContainer = document.querySelector(".cards-post");
 
-if(close){
-close.addEventListener('click', () => {
-menu.style.right = '-100%';
-overlay.style.display = 'none';
-});
-}
-if(overlay){
-overlay.addEventListener('click', () => {
-menu.style.right = '-100%';
-overlay.style.display = 'none';
-});
-}
+ 
+  posts.forEach(p => {
+    if (!Array.isArray(p.comments)) {
+      p.comments = []; 
+    }
+  });
 
+  localStorage.setItem("posts", JSON.stringify(posts));
 
-if(currentPage === 'index.html'){
-    function renderLastThreeComments() {
+ 
+  function getPostComments(postId) {
+    const post = posts.find(p => Number(p.id) === Number(postId));
+    return post ? post.comments : [];
+  }
 
-    const postId = Number(localStorage.getItem('selectedPost'));
-    const posts = JSON.parse(localStorage.getItem("posts")) || [];
-    const comments = JSON.parse(localStorage.getItem("comments")) || [];
+ 
+  function renderPosts(filteredPosts) {
 
-    const post = posts.find(p => p.id === postId);
-    const postAuthor = post ? post.author : null;
+    cardsContainer.innerHTML = "";
 
-    console.log(postAuthor)
+    filteredPosts.forEach(post => {
 
-    const sortedComments = comments.sort((a, b) => b.id - a.id);
+      const card = document.createElement("div");
+      card.classList.add("cardpost");
 
-    // 3️⃣ Marrim vetëm 3 komentet më të fundit
-    const lastThreeComments = sortedComments.slice(0, 3);
+      const imageSrc = getPostImage(post);
 
-    // 4️⃣ Marrim container nga DOM
-    const commentsContainer = document.querySelector(".comments-container");
+      card.innerHTML = `
+        <div class="post-content">
+            <div class="post-header">
+                <div class="post-meta">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <div class="post-info">
+                        <h3>${post.author}</h3>
+                        <p>${post.date} at ${post.time}</p>
+                    </div>
+                </div>
+                <img src="${imageSrc}" alt="Post image">
+            </div>
 
-    // pastrojmë container
-    commentsContainer.innerHTML = "";
+            <div class="insidecards">
+                <p>${post.title}</p>
+                <div class="msgviewicon">
+                    <i class="fa-regular fa-eye"></i><p>2</p>
+                    <i class="fa-regular fa-message"></i>
+                    <p class="comments-count-icon">0</p>
+                </div>
+            </div>
 
-    // 5️⃣ Gjenerojmë HTML
-    lastThreeComments.forEach(comment => {
+            <p class="comment-text">${post.description}</p>
+        </div>
 
-        const commentDiv = document.createElement("div");
-        commentDiv.classList.add("single-comment");
+        <div class="comment-section">
+            <h2>Comments <span class="comments-count">(0)</span></h2>
+            <div class="comments-container"></div>
 
-        commentDiv.innerHTML = `
-            <i class="fa-solid fa-circle-user"></i>
-            <span class="profile-header-name">${comment.author} to ${postAuthor}</span>
-            <p class="comment-date">${comment.date} at ${comment.time}</p>
-            <p>${comment.comment}</p>
+            <div class="comments-form">
+                <h2>Add a comment</h2>
+                <form>
+                    <textarea class="comment-input no-clear"
+                     placeholder="Write your comment here..."></textarea>
+                    <button type="submit" class="no-clear">
+                        Post Comment
+                    </button>
+                </form>
+            </div>
+        </div>
+      `;
+
+      cardsContainer.appendChild(card);
+
+      const commentsContainer = card.querySelector(".comments-container");
+      const commentsCount = card.querySelector(".comments-count");
+      const commentIcon = card.querySelector(".comments-count-icon");
+      const form = card.querySelector("form");
+      const textarea = card.querySelector(".comment-input");
+
+     
+
+      const postComments = getPostComments(post.id);
+
+      postComments.forEach(comment => {
+
+        const div = document.createElement("div");
+        div.classList.add("single-comment");
+
+        div.innerHTML = `
+          <i class="fa-solid fa-circle-user"></i>
+          <span class="profile-header-name">${comment.author}</span>
+          <p class="comment-date">${comment.date} at ${comment.time}</p>
+          <p>${comment.comment}</p>
         `;
 
-        commentsContainer.appendChild(commentDiv);
+       
+
+        if (currentUser === post.author || currentUser === comment.author) {
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "Delete";
+          deleteBtn.style.marginLeft = "10px";
+
+          deleteBtn.addEventListener("click", () => {
+
+            const postIndex = posts.findIndex(p => p.id === post.id);
+
+            
+            if (currentUser === post.author) {
+
+              comments = comments.filter(c => c.postId !== post.id);
+              posts[postIndex].comments = [];
+
+            }
+            
+            else {
+
+              comments = comments.filter(c => c.id !== comment.id);
+              posts[postIndex].comments =
+                posts[postIndex].comments.filter(c => c.id !== comment.id);
+            }
+
+            localStorage.setItem("comments", JSON.stringify(comments));
+            localStorage.setItem("posts", JSON.stringify(posts));
+
+            renderPosts(posts); 
+          });
+
+          div.appendChild(deleteBtn);
+        }
+
+        commentsContainer.appendChild(div);
+      });
+
+      commentsCount.textContent = `(${postComments.length})`;
+      commentIcon.textContent = `${postComments.length}`;
+
+      const postContent = card.querySelector(".post-content");
+
+      postContent.addEventListener("click", (e) => {
+        e.stopPropagation();
+        localStorage.setItem("selectedPost", post.id);
+      });
+
+     
+      form.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        const commentText = textarea.value.trim();
+
+        if (!currentUser) {
+          alert("Please login first");
+          goTo("login.html");
+          return;
+        }
+
+        if (!commentText) return;
+
+        const now = new Date();
+
+        const newComment = {
+          id: Date.now(),
+          comment: commentText,
+          author: currentUser,
+          postId: post.id,
+          date: now.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          time: now.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }),
+        };
+
+       
+        comments.push(newComment);
+
+       
+        const postIndex = posts.findIndex(p => p.id === post.id);
+
+        if (postIndex !== -1) {
+          posts[postIndex].comments.push(newComment);
+        }
+
+       
+        const userIndex = users.findIndex(user =>
+          user.posts && user.posts.some(p => Number(p.id) === Number(post.id))
+        );
+
+        if (userIndex !== -1) {
+
+          const userPostIndex = users[userIndex].posts.findIndex(
+            p => Number(p.id) === Number(post.id)
+          );
+
+          if (userPostIndex !== -1) {
+            if (!Array.isArray(users[userIndex].posts[userPostIndex].comments)) {
+              users[userIndex].posts[userPostIndex].comments = [];
+            }
+
+            users[userIndex].posts[userPostIndex].comments.push(newComment);
+          }
+        }
+
+        localStorage.setItem("comments", JSON.stringify(comments));
+        localStorage.setItem("posts", JSON.stringify(posts));
+        localStorage.setItem("users", JSON.stringify(users));
+
+        renderPosts(posts); 
+      });
+
     });
+  }
+
+  renderPosts(posts);
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".no-clear")) {
+      localStorage.removeItem("selectedPost");
+    }
+  });
 }
-document.addEventListener("DOMContentLoaded", () => {
-    renderLastThreeComments();
-});
+
+const hamburger = document.getElementById("hamburger");
+const menu = document.getElementById("menu");
+const close = document.getElementById("close");
+const overlay = document.getElementById("overlay");
+
+if (hamburger) {
+  hamburger.addEventListener("click", () => {
+    menu.style.right = "0";
+    overlay.style.display = "block";
+    document.querySelectorAll(".profile-header-name").forEach((el) => {
+      el.innerHTML = currentUser || "Guest";
+    });
+  });
+}
+
+if (close) {
+  close.addEventListener("click", () => {
+    menu.style.right = "-100%";
+    overlay.style.display = "none";
+  });
+}
+if (overlay) {
+  overlay.addEventListener("click", () => {
+    menu.style.right = "-100%";
+    overlay.style.display = "none";
+  });
+}
+
+if (currentPage === "post.html") {
+
+  const commentLogos = document.querySelectorAll(".fa-message");
+
+  commentLogos.forEach((logo) => {
+    logo.addEventListener("click", () => {
+
+      const card = logo.closest(".cardpost"); 
+      const commentSection = card.querySelector(".comment-section"); 
+
+      
+      commentSection.classList.toggle("open");
+
+    });
+  });
 
 }
+
+const activePage = window.location.pathname.split("/").pop(); 
+const navLinks = document.querySelectorAll(".navigation a"); 
+
+navLinks.forEach(link => {
+  
+  const hrefPage = link.getAttribute("href");
+
+  if (hrefPage === activePage) {
+    
+    link.classList.add("active");
+  } else {
+    link.classList.remove("active");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutIcon = document.querySelector(".hamburger-logout");
+  if(logoutIcon){
+    logoutIcon.addEventListener("click", (e) => {
+      e.preventDefault(); 
+      localStorage.removeItem("currentUser");
+      window.location.href = "login.html";
+    });
+  }
+});
+
