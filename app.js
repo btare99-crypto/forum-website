@@ -7,6 +7,11 @@ let comments = JSON.parse(localStorage.getItem("comments")) || [];
 function renderLastThreeComments() { 
     const postId = Number(localStorage.getItem("selectedPost")); 
     
+    // ⚠️ BUG — Array.sort() mutates the original array in place.
+    // This permanently changes the order of the global `comments` array every time this function runs.
+    // On the second call, the data is already sorted (or partially sorted), which may produce wrong results.
+    // FIX: Use [...comments].sort(...) to sort a copy instead of the original.
+    // LEARN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
     const sortedComments = comments.sort((a, b) => b.id - a.id); 
 
     const lastThreeComments = sortedComments.slice(0, 3); 
@@ -23,6 +28,12 @@ function renderLastThreeComments() {
       const commentDiv = document.createElement("div"); 
       commentDiv.classList.add("single-comment"); 
 
+      // ⚠️ SECURITY — XSS (Cross-Site Scripting) vulnerability.
+      // Inserting user-controlled data (comment.author, comment.comment, postAuthor) directly into innerHTML
+      // allows a malicious user to inject <script> tags or event handlers that execute in other users' browsers.
+      // Example attack: a user registers with username: <img src=x onerror="alert('hacked')">
+      // FIX: Use textContent for plain text values, or sanitize with DOMPurify before rendering HTML.
+      // LEARN: https://owasp.org/www-community/attacks/xss/
       commentDiv.innerHTML = `
         <i class="fa-solid fa-circle-user"></i>
         <span class="profile-header-name">
@@ -44,6 +55,12 @@ function getPostImage(post) {
     : "images/nophotoimage.avif"; 
 }
 
+// ⚠️ BUG — This function is defined twice (see also line ~583).
+// The two versions have different logic: this one compares postId by reference (===),
+// while the second uses Number() coercion. JavaScript will silently use whichever is declared last,
+// making this version unreachable inside the post.html block.
+// FIX: Keep only one definition. Use consistent ID types throughout (always string or always number).
+// LEARN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness
 function getPostComments(postId) { 
   return comments.filter(c => c.postId === postId); 
 }
@@ -53,6 +70,11 @@ function profileHeaderName() {
   const iconGuest = document.querySelector(".icon-guest"); 
   const iconLoggedIn = document.querySelector(".icon-logged-in"); 
   if (!profileHeaderName) return; 
+  // ⚠️ BUG — This condition is unreachable/redundant.
+  // If `profileHeaderName` were falsy, we already returned on the line above.
+  // By the time execution reaches this line, `profileHeaderName` is always truthy,
+  // so the `if (profileHeaderName)` check is unnecessary and adds confusion.
+  // FIX: Remove the `if (profileHeaderName)` wrapper and keep only the inner logic.
   if (profileHeaderName) { 
     if (currentUser) { 
       profileHeaderName.innerText = currentUser; 
@@ -126,6 +148,12 @@ if (currentPage === "register.html") {
       return; 
     }
 
+    // ⚠️ CRITICAL SECURITY — Passwords are stored in plaintext.
+    // Anyone who inspects localStorage in DevTools (or any XSS attack) can read all user passwords.
+    // Real applications always hash passwords on the server using algorithms like bcrypt or argon2.
+    // In a client-only app like this, there is no truly safe option, but storing plaintext is the worst choice.
+    // FIX: Never store raw passwords. For learning, explore how bcrypt.js works, even client-side.
+    // LEARN: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
     const newUser = { 
       username, 
       email,
@@ -169,6 +197,9 @@ if (currentPage === "login.html") {
     const username = usernameInput.value.trim(); 
     const password = passwordInput.value.trim(); 
 
+    // ⚠️ CRITICAL SECURITY — Login also compares plaintext passwords directly.
+    // This works only because passwords are stored plaintext (see registration above).
+    // In a real app, you'd hash the entered password and compare hashes — never the raw value.
     const user = users.find((u) => u.username === username && u.password === password); 
 
     if (user) { 
@@ -196,6 +227,9 @@ if (currentPage === "create-post.html") {
 
     const title = document.getElementById("title").value;  
     const description = document.getElementById("description").value; 
+    // ⚠️ NOTE — `file` will be `undefined` if no file is selected, which is handled below.
+    // This is safe here, but be mindful: accessing .files[0] on a non-file input would crash.
+    // Good habit: always validate file type and size before reading (e.g., check file.type and file.size).
     const file = document.getElementById("image").files[0]; 
     const category = document.getElementById("categories").value;
 
@@ -234,6 +268,11 @@ if (currentPage === "create-post.html") {
       posts.push(newPost); 
       localStorage.setItem("posts", JSON.stringify(posts)); 
       
+      // ⚠️ DESIGN — Posts are stored in two separate places: the global `posts` array AND inside `user.posts`.
+      // This creates a data sync problem: when a post is edited or deleted, you must update both locations.
+      // If one is missed, the two copies go out of sync, causing bugs (e.g., profile shows stale titles).
+      // FIX: Store posts in only one place. In profile.html, filter from the global posts array by author.
+      // LEARN: This is the "single source of truth" principle — https://en.wikipedia.org/wiki/Single_source_of_truth
       const user = users.find((u) => u.username === currentUser); 
       if (user) {
         if (!user.posts) user.posts = []; 
@@ -308,6 +347,11 @@ if (currentPage === "index.html") {
                 <div class="insidecards">
                     <p>${post.title}</p>
                     <div class="msgviewicon">
+                        <!-- ⚠️ BUG — View count is hardcoded to "2" and comment count to "3".
+                             These are test values left in production. The comment count is correctly
+                             updated via JS below (line ~319), but the view count is never calculated.
+                             FIX: Remove the hardcoded values. Add a `views` property to each post
+                             and increment it when a post is visited. -->
                         <i class="fa-regular fa-eye"></i><p>2</p>
                         <i class="fa-regular fa-message" title="comments"></i></i><p class="comments-count-icon">3</p>
                     </div>
@@ -325,68 +369,7 @@ if (currentPage === "index.html") {
         localStorage.setItem("selectedPost", post.id); 
         goTo("post.html");
       });
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest(".fa-message")) {
-          localStorage.removeItem("selectedPost");
-        }
-      });
-
-      cardsContainer.appendChild(card); 
-    });
-  }
-
-  const create = document.getElementById("createPostBtn"); 
-  create.addEventListener("click", function () {
-    
-    goTo("create-post.html"); 
-  });
-
-  renderPosts(posts); 
-
- 
-  const searchInput = document.querySelector(".searchbar-search input"); 
-  searchInput.addEventListener("input", function () {
-    
-    const query = this.value.toLowerCase(); 
-    const filtered = posts.filter(
-      (
-        p, 
-      ) =>
-        p.title.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query), 
-    );
-    renderPosts(filtered); 
-  });
-
- 
-  const myPostsBtn = document.querySelector(
-    ".searchbar-categories ul li:nth-child(3) a",
-  ); 
-  myPostsBtn.addEventListener("click", function (e) {
-    
-    e.preventDefault(); 
-    const postCategories = document.getElementById("post-categories");
-    postCategories.innerHTML = "My Posts";
-    const myPosts = posts.filter((p) => p.author === currentUser); 
-    renderPosts(myPosts); 
-  });
-
- 
-  const allPostsBtn = document.querySelector(
-    ".searchbar-categories ul li:nth-child(2) a",
-  ); 
-  allPostsBtn.addEventListener("click", function (e) {
-    
-    e.preventDefault(); 
-    const postCategories = document.getElementById("post-categories");
-    postCategories.innerHTML = "All Posts";
-    renderPosts(posts); 
-  });
- 
-  const links = document.querySelectorAll(".dropdown-content a");
-  const cards = document.querySelectorAll(".cardpost");
-
-  links.forEach((link) => {
+  document.addEventListener("click", (e) => {
     link.addEventListener("click", function (e) {
       e.preventDefault(); 
 
@@ -394,10 +377,17 @@ if (currentPage === "index.html") {
 
       const categories = posts.filter((p) => p.category === category); 
       const postCategories = document.getElementById("post-categories");
+      // ⚠️ MINOR — category is a user-visible label, not HTML, so use textContent here instead of innerHTML.
+      // Using innerHTML with any user-influenced value is a risky habit to build.
       postCategories.innerHTML = `${category}`;
       renderPosts(categories);
     });
   });
+  // ⚠️ BUG — renderLastThreeComments() is called twice: once immediately, and again inside DOMContentLoaded.
+  // By the time this script runs, the DOM is already fully loaded (the script is not marked defer/async here).
+  // The DOMContentLoaded listener will never fire because the event already fired before this code ran.
+  // FIX: Call renderLastThreeComments() once. If needed at DOM-ready time, move the script to the end of <body>
+  // or use the defer attribute on the <script> tag.
   renderLastThreeComments();
   document.addEventListener("DOMContentLoaded", () => {
     renderLastThreeComments();
@@ -540,6 +530,10 @@ const textElement = document.getElementById("typing-text");
 
 if (textElement) {
   
+  // ⚠️ BUG — `username` is fetched from localStorage but never used.
+  // The text displayed uses `currentUser` (the global variable) directly instead.
+  // If `currentUser` is null (guest), this will render "Hi, Welcome null" in the UI.
+  // FIX: Replace `currentUser` with `currentUser || "Guest"` in the template string below.
   const username = localStorage.getItem("username") || "Guest"; 
   const text = `Hi, Welcome ${currentUser}`; 
 
@@ -580,6 +574,12 @@ if (currentPage === "post.html") {
   localStorage.setItem("posts", JSON.stringify(posts));
 
  
+  // ⚠️ BUG — Duplicate function: `getPostComments` is already defined at the top of the file (line ~47).
+  // Because this second definition is inside the `if (currentPage === "post.html")` block,
+  // JavaScript hoisting means the global version at the top is used elsewhere on the page
+  // but this local version shadows it inside this block.
+  // The two versions use different comparison logic (=== vs Number()), which can produce inconsistent results.
+  // FIX: Remove this duplicate. Normalize all post IDs to the same type at the data layer (always number or always string).
   function getPostComments(postId) {
     const post = posts.find(p => Number(p.id) === Number(postId));
     return post ? post.comments : [];
@@ -656,6 +656,10 @@ if (currentPage === "post.html") {
         const div = document.createElement("div");
         div.classList.add("single-comment");
 
+        // ⚠️ SECURITY — XSS vulnerability (same issue as line ~26).
+        // comment.author and comment.comment are user-controlled values rendered via innerHTML.
+        // A malicious user could store HTML/script tags as their comment or username.
+        // FIX: Use textContent for each field, or sanitize with DOMPurify before setting innerHTML.
         div.innerHTML = `
           <i class="fa-solid fa-circle-user"></i>
           <span class="profile-header-name">${comment.author}</span>
@@ -693,6 +697,11 @@ if (currentPage === "post.html") {
             localStorage.setItem("comments", JSON.stringify(comments));
             localStorage.setItem("posts", JSON.stringify(posts));
 
+            // ⚠️ DESIGN — Calling renderPosts(posts) after every deletion re-renders the entire post list.
+            // This destroys and recreates all DOM elements, losing focus, scroll position, and open states.
+            // It also re-attaches all form event listeners (submit, click), which can stack up and fire multiple times.
+            // FIX: After deleting a comment, remove only that comment's DOM element instead of re-rendering everything.
+            // Example: div.remove() — then update the count manually.
             renderPosts(posts); 
           });
 
@@ -788,11 +797,15 @@ if (currentPage === "post.html") {
 
   renderPosts(posts);
 
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".no-clear")) {
-      localStorage.removeItem("selectedPost");
-    }
-  });
+      // ⚠️ DESIGN — A new global "click" listener is added to the document for every post rendered.
+      // If renderPosts() is called multiple times (e.g., after search), listeners accumulate and
+      // localStorage.removeItem("selectedPost") fires multiple times per click.
+      // FIX: Add this listener once, outside of renderPosts(), not inside the forEach loop.
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".fa-message")) {
+          localStorage.removeItem("selectedPost");
+        }
+      });
 }
 
 const hamburger = document.getElementById("hamburger");
