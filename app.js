@@ -1,3 +1,5 @@
+
+
 const currentPage = window.location.pathname.split("/").pop(); 
 let currentUser = localStorage.getItem("currentUser"); 
 let users = JSON.parse(localStorage.getItem("users")) || []; 
@@ -7,7 +9,7 @@ let comments = JSON.parse(localStorage.getItem("comments")) || [];
 function renderLastThreeComments() { 
     const postId = Number(localStorage.getItem("selectedPost")); 
     
-    const sortedComments = comments.sort((a, b) => b.id - a.id); 
+    const sortedComments = [...comments].sort((a, b) => b.id - a.id); 
 
     const lastThreeComments = sortedComments.slice(0, 3); 
 
@@ -24,17 +26,24 @@ function renderLastThreeComments() {
       commentDiv.classList.add("single-comment"); 
 
       commentDiv.innerHTML = `
-        <i class="fa-solid fa-circle-user"></i>
-        <span class="profile-header-name">
-            ${comment.author} to ${postAuthor} 
-        </span>
-        <p class="comment-date">${comment.date} at ${comment.time}</p>
-        <p>${comment.comment}</p>
-    `; 
+          <i class="fa-solid fa-circle-user"></i>
+          <span class="profile-header-name"></span>
+          <p class="comment-date"></p>
+          <p class="comment-text"></p>
+      `;
+
+      commentDiv.querySelector(".profile-header-name").textContent =
+          `${comment.author} to ${postAuthor}`;
+
+      commentDiv.querySelector(".comment-date").textContent =
+          `${comment.date} at ${comment.time}`;
+
+      commentDiv.querySelector(".comment-text").textContent =
+          comment.comment; 
       commentsContainer.appendChild(commentDiv);
     });
   }
-function goTo(page){ 
+  function goTo(page){ 
     window.location.href = page; 
 };
 
@@ -44,8 +53,9 @@ function getPostImage(post) {
     : "images/nophotoimage.avif"; 
 }
 
-function getPostComments(postId) { 
-  return comments.filter(c => c.postId === postId); 
+function getPostComments(postId) {
+  const post = posts.find(p => Number(p.id) === Number(postId));
+  return post ? post.comments : [];
 }
 
 function profileHeaderName() { 
@@ -53,14 +63,13 @@ function profileHeaderName() {
   const iconGuest = document.querySelector(".icon-guest"); 
   const iconLoggedIn = document.querySelector(".icon-logged-in"); 
   if (!profileHeaderName) return; 
-  if (profileHeaderName) { 
-    if (currentUser) { 
-      profileHeaderName.innerText = currentUser; 
-    } else { 
-      profileHeaderName.innerText = `Guest`;
-      iconGuest.style.display = "block"; 
-      iconLoggedIn.style.display = "none"; 
-    }
+
+  if (currentUser) { 
+    profileHeaderName.innerText = currentUser; 
+  } else { 
+    profileHeaderName.innerText = `Guest`;
+    iconGuest.style.display = "block"; 
+    iconLoggedIn.style.display = "none"; 
   }
 }
 document.addEventListener("DOMContentLoaded", profileHeaderName);
@@ -126,10 +135,13 @@ if (currentPage === "register.html") {
       return; 
     }
 
+    const salt = dcodeIO.bcrypt.genSaltSync(10);
+    const hashedPassword = dcodeIO.bcrypt.hashSync(password, salt);
+
     const newUser = { 
       username, 
       email,
-      password,
+      password: hashedPassword,
       memberSince: new Date().toLocaleDateString(), 
       profilePic: "", 
     };
@@ -169,7 +181,8 @@ if (currentPage === "login.html") {
     const username = usernameInput.value.trim(); 
     const password = passwordInput.value.trim(); 
 
-    const user = users.find((u) => u.username === username && u.password === password); 
+    const user = users.find(u => u.username === username);
+    const isValid = dcodeIO.bcrypt.compareSync(password, user.password);
 
     if (user) { 
       localStorage.setItem("currentUser", username); 
@@ -228,20 +241,30 @@ if (currentPage === "create-post.html") {
         author: currentUser, 
         date: formattedDate, 
         time: formattedTime, 
+        views: 0
       };
 
       
       posts.push(newPost); 
       localStorage.setItem("posts", JSON.stringify(posts)); 
       
-      const user = users.find((u) => u.username === currentUser); 
-      if (user) {
-        if (!user.posts) user.posts = []; 
-        user.posts.push(newPost); 
-        localStorage.setItem("users", JSON.stringify(users)); 
-      }
       goTo("index.html"); 
     };
+
+    if (file) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        alert("Please select a valid image file (jpg, png, gif).");
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert("File is too large. Max size is 5MB.");
+        return;
+      }
+    }
 
     if (file) {
       const reader = new FileReader(); 
@@ -308,7 +331,7 @@ if (currentPage === "index.html") {
                 <div class="insidecards">
                     <p>${post.title}</p>
                     <div class="msgviewicon">
-                        <i class="fa-regular fa-eye"></i><p>2</p>
+                        <i class="fa-regular fa-eye"></i><p class="view-count">${post.views}</p>
                         <i class="fa-regular fa-message" title="comments"></i></i><p class="comments-count-icon">3</p>
                     </div>
                 </div>
@@ -318,17 +341,21 @@ if (currentPage === "index.html") {
       const postComments = getPostComments(post.id); 
       commentIcon.textContent = `${postComments.length}`;
 
+      card.addEventListener("click", () => {
+        if(post.author !== currentUser){
+          post.views += 1;
+          const viewCountEl = card.querySelector(".view-count");
+          viewCountEl.textContent = post.views;
+          localStorage.setItem("posts", JSON.stringify(posts)); 
+        }
+      });
+
       const messageLogo = card.querySelector(".fa-message");
       messageLogo.addEventListener("click", (e) => {
         
         e.stopPropagation();
         localStorage.setItem("selectedPost", post.id); 
         goTo("post.html");
-      });
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest(".fa-message")) {
-          localStorage.removeItem("selectedPost");
-        }
       });
 
       cardsContainer.appendChild(card); 
@@ -359,27 +386,17 @@ if (currentPage === "index.html") {
   });
 
  
-  const myPostsBtn = document.querySelector(
-    ".searchbar-categories ul li:nth-child(3) a",
-  ); 
+  const myPostsBtn = document.getElementById("my-posts")
   myPostsBtn.addEventListener("click", function (e) {
-    
     e.preventDefault(); 
-    const postCategories = document.getElementById("post-categories");
-    postCategories.innerHTML = "My Posts";
     const myPosts = posts.filter((p) => p.author === currentUser); 
     renderPosts(myPosts); 
   });
 
  
-  const allPostsBtn = document.querySelector(
-    ".searchbar-categories ul li:nth-child(2) a",
-  ); 
+  const allPostsBtn = document.getElementById("all-posts")
   allPostsBtn.addEventListener("click", function (e) {
-    
     e.preventDefault(); 
-    const postCategories = document.getElementById("post-categories");
-    postCategories.innerHTML = "All Posts";
     renderPosts(posts); 
   });
  
@@ -394,14 +411,11 @@ if (currentPage === "index.html") {
 
       const categories = posts.filter((p) => p.category === category); 
       const postCategories = document.getElementById("post-categories");
-      postCategories.innerHTML = `${category}`;
+      postCategories.textContent = `${category}`;
       renderPosts(categories);
     });
   });
   renderLastThreeComments();
-  document.addEventListener("DOMContentLoaded", () => {
-    renderLastThreeComments();
-  });
 }
 
 
@@ -429,7 +443,7 @@ if (currentPage === "profile.html") {
 
   if (currentUser) {
     const cardsContainer = document.querySelector(".cards-profile"); 
-    const myPosts = users.find((u) => u.username === currentUser)?.posts || []; 
+    const myPosts = posts.filter(post => post.author === currentUser); 
     cardsContainer.innerHTML = ""; 
 
     myPosts.forEach((post, index) => {
@@ -451,7 +465,7 @@ if (currentPage === "profile.html") {
                     <div class="insidecards">
                         <p>${post.title}</p>
                     <div class="msgviewicon">
-                        <i class="fa-regular fa-eye"></i><p>2</p>
+                        <i class="fa-regular fa-eye"></i><p class="view-count">${post.views}</p>
                         <i class="fa-regular fa-message" title="comments"></i><p class="comments-count-icon">3</p>
                     </div>
                     </div>
@@ -470,12 +484,9 @@ if (currentPage === "profile.html") {
       deleteBtn.addEventListener("click", () => {
         
         if (confirm("Are you sure you want to delete this post?")) {
-          myPosts.splice(index, 1); 
-
           const globalIndex = posts.findIndex((p) => p.id === post.id); 
           if (globalIndex !== -1) posts.splice(globalIndex, 1); 
 
-          localStorage.setItem("users", JSON.stringify(users)); 
           localStorage.setItem("posts", JSON.stringify(posts));
 
           card.remove(); 
@@ -506,7 +517,6 @@ if (currentPage === "profile.html") {
           globalPost.description = post.description; 
         }
 
-        localStorage.setItem("users", JSON.stringify(users)); 
         localStorage.setItem("posts", JSON.stringify(posts));
       });
     });
@@ -524,13 +534,12 @@ if (currentPage === "profile.html") {
   const totalComments = myPosts.reduce((acc, p) => acc + p.comments.length, 0);
 
   if (currentUser) {
-    
-    const myPosts = users.find((u) => u.username === currentUser)?.posts || [];
+    const myPosts = posts.filter(post => post.author === currentUser); 
     const user = users.find((u) => u.username === currentUser); 
     usernameEl.innerText = user.username; 
     memberEl.innerText = `Member since ${user.memberSince || "July 2025"}`; 
 
-    postsCommentsEl.innerText = `${myPosts.length} Posts | ${totalComments} Comments`; 
+    postsCommentsEl.innerText = `${posts.filter(p => p.author === currentUser).length} Posts | ${totalComments} Comments`;  
 
     if (user.profilePic) profilePicEl.src = user.profilePic; 
   }
@@ -539,9 +548,7 @@ if (currentPage === "profile.html") {
 const textElement = document.getElementById("typing-text"); 
 
 if (textElement) {
-  
-  const username = localStorage.getItem("username") || "Guest"; 
-  const text = `Hi, Welcome ${currentUser}`; 
+  const text = `Hi, Welcome ${currentUser || "Guest"}`; 
 
   textElement.innerText = ""; 
 
@@ -580,10 +587,7 @@ if (currentPage === "post.html") {
   localStorage.setItem("posts", JSON.stringify(posts));
 
  
-  function getPostComments(postId) {
-    const post = posts.find(p => Number(p.id) === Number(postId));
-    return post ? post.comments : [];
-  }
+  const filteredPosts = getPostComments(posts.id);
 
  
   function renderPosts(filteredPosts) {
@@ -613,7 +617,7 @@ if (currentPage === "post.html") {
             <div class="insidecards">
                 <p>${post.title}</p>
                 <div class="msgviewicon">
-                    <i class="fa-regular fa-eye"></i><p>2</p>
+                    <i class="fa-regular fa-eye"></i><p class="view-count">${post.views}</p>
                     <i class="fa-regular fa-message"></i>
                     <p class="comments-count-icon">0</p>
                 </div>
@@ -647,8 +651,6 @@ if (currentPage === "post.html") {
       const form = card.querySelector("form");
       const textarea = card.querySelector(".comment-input");
 
-     
-
       const postComments = getPostComments(post.id);
 
       postComments.forEach(comment => {
@@ -656,14 +658,20 @@ if (currentPage === "post.html") {
         const div = document.createElement("div");
         div.classList.add("single-comment");
 
-        div.innerHTML = `
+        div.innerHTML = (`
           <i class="fa-solid fa-circle-user"></i>
           <span class="profile-header-name">${comment.author}</span>
           <p class="comment-date">${comment.date} at ${comment.time}</p>
-          <p>${comment.comment}</p>
-        `;
+          <p class="comment-text">${comment.comment}</p>
+        `);
+        div.querySelector(".profile-header-name").textContent =
+          `${comment.author}`;
 
-       
+      div.querySelector(".comment-date").textContent =
+          `${comment.date} at ${comment.time}`;
+
+      div.querySelector(".comment-text").textContent =
+          comment.comment; 
 
         if (currentUser === post.author || currentUser === comment.author) {
 
@@ -672,28 +680,29 @@ if (currentPage === "post.html") {
           deleteBtn.style.marginLeft = "10px";
 
           deleteBtn.addEventListener("click", () => {
+            if (confirm("Are you sure you want to delete this comment?")) {
+              const postIndex = posts.findIndex(p => p.id === post.id);
 
-            const postIndex = posts.findIndex(p => p.id === post.id);
+              if (currentUser === post.author) {
 
-            
-            if (currentUser === post.author) {
+                comments = comments.filter(c => c.postId !== post.id);
+                posts[postIndex].comments = [];
+              } else {
 
-              comments = comments.filter(c => c.postId !== post.id);
-              posts[postIndex].comments = [];
+                comments = comments.filter(c => c.id !== comment.id);
+                posts[postIndex].comments =
+                  posts[postIndex].comments.filter(c => c.id !== comment.id);
+              }
 
+              localStorage.setItem("comments", JSON.stringify(comments));
+              localStorage.setItem("posts", JSON.stringify(posts));
+
+              div.remove();
+
+              const newCount = posts[postIndex].comments.length;
+              commentsCount.textContent = `(${newCount})`;
+              commentIcon.textContent = newCount;
             }
-            
-            else {
-
-              comments = comments.filter(c => c.id !== comment.id);
-              posts[postIndex].comments =
-                posts[postIndex].comments.filter(c => c.id !== comment.id);
-            }
-
-            localStorage.setItem("comments", JSON.stringify(comments));
-            localStorage.setItem("posts", JSON.stringify(posts));
-
-            renderPosts(posts); 
           });
 
           div.appendChild(deleteBtn);
@@ -746,9 +755,7 @@ if (currentPage === "post.html") {
           }),
         };
 
-       
         comments.push(newComment);
-
        
         const postIndex = posts.findIndex(p => p.id === post.id);
 
@@ -756,7 +763,6 @@ if (currentPage === "post.html") {
           posts[postIndex].comments.push(newComment);
         }
 
-       
         const userIndex = users.findIndex(user =>
           user.posts && user.posts.some(p => Number(p.id) === Number(post.id))
         );
@@ -787,12 +793,6 @@ if (currentPage === "post.html") {
   }
 
   renderPosts(posts);
-
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".no-clear")) {
-      localStorage.removeItem("selectedPost");
-    }
-  });
 }
 
 const hamburger = document.getElementById("hamburger");
