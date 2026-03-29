@@ -1,13 +1,28 @@
 *{
     box-sizing: border-box;
 }
+body.light-mode{
+    --primary-color: white;
+    --primary-hover: #1e5c90;
+    --dark-color: #000000;
+    --body-color:#053862;
+    --light-color: hsl(0, 0%, 85%);
+    --white: #ffffff;
+    --border-color: #053862;
+    --text-color: #555;
+    --text-light: #666;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --warning-color: #ffc107;
+}
 :root{
     --primary-color: #053862;
     --primary-hover: #1e5c90;
     --dark-color: #000000;
+    --body-color:hsl(0, 0%, 95%);
     --light-color: hsl(0, 0%, 85%);
     --white: #ffffff;
-    --border-color: #dee2e6;
+    --border-color: #ffffff;
     --text-color: #555;
     --text-light: #666;
     --success-color: #28a745;
@@ -22,7 +37,7 @@ html , body {
 body {
     display: flex;
     flex-direction: column;
-    background-color: hsl(0, 0%, 95%);
+    background-color: var(--body-color);
     color: var(--primary-color);
     font-family: "Poppins", sans-serif;
 }
@@ -36,7 +51,7 @@ main {
     color: white;
     font-weight: 100;
     padding: 0 20px;
-    background: linear-gradient(to bottom, var(--primary-hover), var(--dark-color));
+    background-color: #053862;
 }
 .head h1{
     cursor: pointer;
@@ -163,6 +178,21 @@ main {
     color: var(--dark-color);
     pointer-events: none;
 }
+.theme-toggle-btn {
+    width: 40px;
+    height: 40px;
+    background-color: var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.theme-toggle-btn svg{
+    color: var(--primary-color);
+}
 .preview-container {
     height: 250px;
     background-image: url(images/ales-nesetril-Im7lZjxeLhg-unsplash.jpg);
@@ -198,7 +228,7 @@ main {
     margin: 40px;
     border: none;
     background-color: var(--primary-color);
-    color: var(--white);
+    color: var(--border-color);
     cursor: pointer;
 }
 .createpost button:hover ,
@@ -318,78 +348,161 @@ main {
     color: var(--primary-color);
     font-size: 0.9em;
 }
-.comment-section{
+.comment-section {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    margin: 0 40px;
-    width: 100%;
-    padding: 20px;
+    margin: 20px;
+    width: calc(100% - 80px);
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
-.latest-comments{
-    margin: 0 40px;
+
+.comment-section h2 {
+    font-size: 1.4em;
+    color: var(--primary-color);
+    font-weight: 700;
 }
-.comment-section h2{
-    font-size: 1.2em;
+
+.comments-container {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 0px;
 }
-.comments-form textarea{
-    min-height: 80px;
-    width: 100%;
-    border-radius: 5px;
-    box-sizing: border-box;
-    padding: 5px;
-    outline: none;
+
+/* Custom Scrollbar */
+.comments-container::-webkit-scrollbar {
+    width: 6px;
 }
-.comments-form button{
-    padding: 6px 12px;
-    width: 100%;
-    max-width: 250px;
-    height: 30px;
-    margin-top: 10px;
-    border: none;
-    background-color: var(--primary-color);
-    color: white;
-    cursor: pointer;
+
+.comments-container::-webkit-scrollbar-track {
+    background: transparent;
 }
-.comments-form{
+
+.comments-container::-webkit-scrollbar-thumb {
+    background: var(--light-color);
+    border-radius: 10px;
+}
+
+.single-comment {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.single-comment:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.single-comment .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 10px;
 }
-.comments-form h2{
+
+.single-comment .comment-header i {
     font-size: 1.2em;
+    color: var(--primary-color);
 }
-.comments-container{
-    max-height: 220px;
-    overflow-y: auto;
+
+.single-comment .profile-header-name {
+    font-weight: 600;
+    color: var(--primary-color);
 }
-.comments-container::-webkit-scrollbar{
-    width: 10px;
+
+.single-comment .comment-date {
+    font-size: 0.75em;
+    color: var(--text-light);
+    margin-left: auto;
 }
-.comments-container::-webkit-scrollbar-track{
-    background:#eee ;
-    border-radius: 5px;
+
+.single-comment .comment-text {
+    margin: 0;
+    color: var(--text-color);
+    line-height: 1.5;
+    font-size: 0.95em;
 }
-.comments-container::-webkit-scrollbar-thumb{
-    background:#888 ;
-    border-radius: 8px;
-    border: 2px solid #eee;
-}
-.single-comment{
-    border-bottom: 1px solid var(--primary-color);
-    padding: 15px;
-    font-size: 1.1em;
-    word-wrap: break-word;  
-    word-break: break-word; 
-    white-space: normal;
-}
-.single-comment button{
+
+.delete-comment-btn {
+    background: none;
     border: none;
+    color: var(--error-color);
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-top: 10px;
+    padding: 0;
+    opacity: 0.6;
+    transition: opacity 0.2s;
 }
-.delete-comment{
-    display: none;
+
+.delete-comment-btn:hover {
+    opacity: 1;
+    text-decoration: underline;
 }
-.comment-date{
-    font-size: 0.7em;
+
+.comments-form {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--light-color);
 }
+
+.comments-form h2 {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.comments-form textarea {
+    width: 100%;
+    min-height: 100px;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid var(--light-color);
+    background: var(--white);
+    font-family: inherit;
+    font-size: 0.95em;
+    resize: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.comments-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(5, 56, 98, 0.1);
+}
+
+.comments-form button {
+    margin-top: 15px;
+    padding: 12px 25px;
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    width: auto;
+    min-width: 150px;
+}
+
+.comments-form button:hover {
+    background: var(--primary-hover);
+}
+
+.comments-form button:active {
+    transform: scale(0.98);
+}
+
 .footer-content-mobile{
     display: none;
 }
@@ -533,41 +646,57 @@ main {
     justify-content: center;
     margin-bottom: 20px;
 }
-.my-profile{
+.my-profile {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: fit-content;
-    height: fit-content;
-    padding:40px 100px;
+    width: 450px;
+    padding: 50px;
     color: var(--primary-color);
-    box-shadow: 0 0 15px var(--primary-color);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
 }
-.my-profile input{
-    display: none;
-}
-.icon-box{ 
+
+.icon-box { 
     display: inline-block;     
     position: relative;          
     text-align: center;
-    line-height: 100px;         
+    margin-bottom: 20px;
 }
+
+.icon-box #profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
 .icon-box .fa-circle-user{
-    font-size: 100px;
+    font-size: 150px;
     color: var(--primary-color);
-    vertical-align: middle;
 }
-.icon-box .fa-pen-to-square{
-    font-size: 15px;
-    color: var(--primary-color);
+
+.icon-box .edit-icon {
+    font-size: 18px;
+    color: white;
+    background: var(--primary-color);
+    padding: 10px;
+    border-radius: 50%;
     position: absolute;
+    bottom: 5px;
+    right: 5px;
     cursor: pointer;
-    opacity: 0;
-    bottom: 0;
-    right: 1;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
 }
-.icon-box:hover .fa-pen-to-square{
-    opacity: 1;
+
+.icon-box .edit-icon:hover {
+    transform: scale(1.1);
 }
 .welcome{
     margin-top: 30px;
@@ -619,7 +748,7 @@ main {
     width: 100%;
     max-width: 800px;
     margin: 60px auto;
-    background: #ffffff;
+    background-color: var(--border-color);
     padding: 35px 40px;
     box-shadow: 0 0 15px var(--primary-color);
     font-family: "Raleway", sans-serif;
@@ -661,7 +790,7 @@ main {
 .create-post select {
     margin-top: 15px;
     background-color: var(--primary-color);
-    color: var(--white);
+    color: var(--border-color);
     border: none;
     padding: 8px 14px;
     cursor: pointer;
@@ -683,7 +812,7 @@ main {
     margin-top: 25px;
     padding: 14px;
     background-color: var(--primary-color);
-    color: var(--white);
+    color: var(--border-color);
     border: none;
     font-size: 16px;
     font-weight: 600;
@@ -716,28 +845,67 @@ main {
 .dropdown-menu nav ul li:hover  {
     display: block;
 }
-.edit-delte-btns{
-    position: absolute;
+.cardpost-profile {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.05);
 }
+
+.cardpost-profile:hover {
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.editcardpost {
+    position: relative;
+    height: 200px;
+}
+
+.editcardpost img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.edit-delte-btns {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: 0.3s;
+    z-index: 10;
+}
+
+.cardpost-profile:hover .edit-delte-btns {
+    opacity: 1;
+}
+
 .edit-btn,
 .delete-btn {
-  padding: 8px 14px;
-  display: none;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: var(--white);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    backdrop-filter: blur(5px);
 }
+
 .edit-btn {
-  background-color: var(--primary-color);
+    background: rgba(5, 56, 98, 0.9);
+    color: white;
 }
+
 .delete-btn {
-  background-color: var(--error-color);
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
 }
 .guest-box {
     text-align: center;
@@ -1408,4 +1576,79 @@ main {
     #incorrectusername {
         font-size: 0.8em;
     }
+}
+
+/* --- Modal Styles --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none; /* Controlled by JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: modalPop 0.3s ease-out;
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.5em;
+}
+
+.modal-content p {
+    color: var(--text-color);
+    margin: 20px 0;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-confirm {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: var(--primary-hover);
+}
+
+.btn-cancel {
+    background: var(--light-color);
+    color: var(--text-color);
+}
+
+.btn-cancel:hover {
+    background: #ccc;
 }

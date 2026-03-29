@@ -1,3 +1,36 @@
+function showModal(title, message, onConfirm) {
+  let modalOverlay = document.querySelector(".modal-overlay");
+  if (!modalOverlay) {
+    modalOverlay = document.createElement("div");
+    modalOverlay.classList.add("modal-overlay");
+    document.body.appendChild(modalOverlay);
+  }
+
+  modalOverlay.innerHTML = `
+    <div class="modal-content">
+      <h2>${title}</h2>
+      <p>${message}</p>
+      <div class="modal-buttons">
+        <button class="btn-cancel">Cancel</button>
+        <button class="btn-confirm">Confirm</button>
+      </div>
+    </div>
+  `;
+
+  const confirmBtn = modalOverlay.querySelector(".btn-confirm");
+  const cancelBtn = modalOverlay.querySelector(".btn-cancel");
+
+  confirmBtn.onclick = () => {
+    modalOverlay.style.display = "none";
+    if (onConfirm) onConfirm();
+  };
+
+  cancelBtn.onclick = () => {
+    modalOverlay.style.display = "none";
+  };
+
+  modalOverlay.style.display = "flex";
+}
 
 
 const currentPage = window.location.pathname.split("/").pop(); 
@@ -26,9 +59,11 @@ function renderLastThreeComments() {
       commentDiv.classList.add("single-comment"); 
 
       commentDiv.innerHTML = `
-          <i class="fa-solid fa-circle-user"></i>
-          <span class="profile-header-name"></span>
-          <p class="comment-date"></p>
+          <div class="comment-header">
+              <i class="fa-solid fa-circle-user"></i>
+              <span class="profile-header-name"></span>
+              <p class="comment-date"></p>
+          </div>
           <p class="comment-text"></p>
       `;
 
@@ -244,11 +279,12 @@ if (currentPage === "create-post.html") {
         views: 0
       };
 
-      
       posts.push(newPost); 
       localStorage.setItem("posts", JSON.stringify(posts)); 
       
-      goTo("index.html"); 
+      showModal("Success", "Your post has been created successfully!", () => {
+        goTo("index.html"); 
+      });
     };
 
     if (file) {
@@ -454,25 +490,22 @@ if (currentPage === "profile.html") {
       const imageSrc = getPostImage(post);
 
       card.innerHTML = `
-                <div class="cardpost-profile">
-                    <div class="editcardpost">
-                        <div class="edit-delte-btns"> 
-                            <button class="edit-btn">Edit</button>
-                            <button class="delete-btn">Delete</button>
-                        </div>
-                        <img src="${imageSrc}" alt="Post image">
+                <div class="editcardpost">
+                    <div class="edit-delte-btns"> 
+                        <button class="edit-btn">Edit</button>
+                        <button class="delete-btn">Delete</button>
                     </div>
-                    <div class="insidecards">
-                        <p>${post.title}</p>
-                    <div class="msgviewicon">
-                        <i class="fa-regular fa-eye"></i><p class="view-count">${post.views}</p>
-                        <i class="fa-regular fa-message" title="comments"></i><p class="comments-count-icon">3</p>
-                    </div>
-                    </div>
-                    <p class="comment-text">${post.description}</p>
+                    <img src="${imageSrc}" alt="Post image">
                 </div>
-                
-            `;
+                <div class="insidecards">
+                    <p>${post.title}</p>
+                <div class="msgviewicon">
+                    <i class="fa-regular fa-eye"></i><p class="view-count">${post.views}</p>
+                    <i class="fa-regular fa-message" title="comments"></i><p class="comments-count-icon">3</p>
+                </div>
+                </div>
+                <p class="comment-text">${post.description}</p>
+        `;
       cardsContainer.appendChild(card); 
 
       const postComments = getPostComments(post.id)
@@ -481,9 +514,8 @@ if (currentPage === "profile.html") {
 
      
       const deleteBtn = card.querySelector(".delete-btn"); 
-      deleteBtn.addEventListener("click", () => {
-        
-        if (confirm("Are you sure you want to delete this post?")) {
+      deleteBtn.onclick = () => {
+        showModal("Delete Post", "Are you sure you want to delete this post?", () => {
           const globalIndex = posts.findIndex((p) => p.id === post.id); 
           if (globalIndex !== -1) posts.splice(globalIndex, 1); 
 
@@ -494,8 +526,8 @@ if (currentPage === "profile.html") {
           const postsCommentsEl = document.getElementById("posts-comments"); 
           if (postsCommentsEl)
             postsCommentsEl.innerText = `${myPosts.length} Posts | 0 Comments`; 
-        }
-      });
+        });
+      };
 
      
       const editBtn = card.querySelector(".edit-btn"); 
@@ -628,6 +660,7 @@ if (currentPage === "post.html") {
 
         <div class="comment-section">
             <h2>Comments <span class="comments-count">(0)</span></h2>
+            
             <div class="comments-container"></div>
 
             <div class="comments-form">
@@ -658,12 +691,14 @@ if (currentPage === "post.html") {
         const div = document.createElement("div");
         div.classList.add("single-comment");
 
-        div.innerHTML = (`
-          <i class="fa-solid fa-circle-user"></i>
-          <span class="profile-header-name">${comment.author}</span>
-          <p class="comment-date">${comment.date} at ${comment.time}</p>
+        div.innerHTML = `
+          <div class="comment-header">
+              <i class="fa-solid fa-circle-user"></i>
+              <span class="profile-header-name">${comment.author}</span>
+              <p class="comment-date">${comment.date} at ${comment.time}</p>
+          </div>
           <p class="comment-text">${comment.comment}</p>
-        `);
+        `;
         div.querySelector(".profile-header-name").textContent =
           `${comment.author}`;
 
@@ -677,10 +712,10 @@ if (currentPage === "post.html") {
 
           const deleteBtn = document.createElement("button");
           deleteBtn.textContent = "Delete";
-          deleteBtn.style.marginLeft = "10px";
+          deleteBtn.classList.add("delete-comment-btn");
 
-          deleteBtn.addEventListener("click", () => {
-            if (confirm("Are you sure you want to delete this comment?")) {
+          deleteBtn.onclick = () => {
+            showModal("Delete Comment", "Are you sure you want to delete this comment?", () => {
               const postIndex = posts.findIndex(p => p.id === post.id);
 
               if (currentUser === post.author) {
@@ -702,8 +737,8 @@ if (currentPage === "post.html") {
               const newCount = posts[postIndex].comments.length;
               commentsCount.textContent = `(${newCount})`;
               commentIcon.textContent = newCount;
-            }
-          });
+            });
+          };
 
           div.appendChild(deleteBtn);
         }
